@@ -1,48 +1,79 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <title>Gorilla Work Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>Gorilla Print & Apparel 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Global / shared style guide -->
-  <link rel="stylesheet" href="./shared/styles.css">
+    <!-- Global / shared style guide -->
+    <link rel="stylesheet" href="./shared/styles.css">
 </head>
+
 <body>
-  <div class="site-root">
-    <header class="site-header">
-      <div class="site-header-inner">
-        <div class="site-logo">
-          <!-- Inline SVG or <img> logo goes here -->
-          <!-- Example:
-          <img src="./assets/header-logo.svg" alt="Gorilla" />
-          -->
-          <div class="site-title">
-            Gorilla Designer &amp; Quoter
-          </div>
-        </div>
+    <div class="site-root">
+        <header class="site-header">
+            <div class="site-header-inner">
+                <div class="site-logo" role="img" aria-label="Gorilla logo"></div>
+                <button class="menu-toggle" type="button" aria-label="Open menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <nav class="menu-drawer" aria-label="Section navigation" hidden>
+                    <ul class="menu-list"></ul>
+                </nav>
+            </div>
+        </header>
 
-        <nav class="site-nav" aria-label="Section navigation">
-          <a href="#designer-section">Designer</a>
-          <a href="#quoter-section">Quoter</a>
-        </nav>
-      </div>
-    </header>
+        <main>
+            
+            <section id="designer-section" class="section section-designer" data-nav-title="About">
+                <div class="section-inner">
+                    <!-- initDesigner(rootEl) will render into here -->
+                </div>
+            </section>
 
-    <main>
-      <!-- Designer section mount point -->
-      <section id="designer-section" class="panel panel-designer">
-        <!-- initDesigner(rootEl) will render into here -->
-      </section>
+            
+            <section id="quoter-section" class="section section-quoter" data-nav-title="Quick Quote">
+                <div class="section-inner">
+                    <!-- initQuoter(rootEl) will render into here -->
+                </div>
+            </section>
 
-      <!-- Quoter section mount point -->
-      <section id="quoter-section" class="panel panel-quoter">
-        <!-- initQuoter(rootEl) will render into here -->
-      </section>
-    </main>
-  </div>
+           
+            <section id="extra-section" class="section section-extra" data-nav-title="Gallery">
+                <div class="section-inner">
+                    <!-- Additional content goes here -->
+                </div>
+            </section>
 
-  <!-- Hub JS that wires in the individual sections -->
-  <script type="module" src="./main.js"></script>
+            <section id="custom-totes-section" class="section section-custom-totes" data-nav-title="Custom Totes">
+                <div class="section-inner">
+                    <!-- Additional content goes here -->
+                </div>
+            </section>
+
+            <!-- External link menu item (no on-page content) -->
+            <section class="section section-linkout" data-nav-title="Custom Tees Now!" data-nav-link="https://designer.gorillaprintshop.com">
+                <div class="section-inner">
+                    <!-- This section only exists to power the menu link -->
+                </div>
+            </section>
+
+
+        </main>
+
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="footer-brand">Gorilla Print &amp; Apparel</div>
+                <div class="footer-meta">est. 2006 ~ © 2026</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hub JS that wires in the individual sections -->
+    <script type="module" src="./main.js"></script>
 </body>
+
 </html>
