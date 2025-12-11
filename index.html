@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Gorilla Work Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Global / shared style guide -->
+  <link rel="stylesheet" href="./shared/styles.css">
+</head>
+<body>
+  <div class="site-root">
+    <header class="site-header">
+      <div class="site-header-inner">
+        <div class="site-logo">
+          <!-- Inline SVG or <img> logo goes here -->
+          <!-- Example:
+          <img src="./assets/header-logo.svg" alt="Gorilla" />
+          -->
+          <div class="site-title">
+            Gorilla Designer &amp; Quoter
+          </div>
+        </div>
+
+        <nav class="site-nav" aria-label="Section navigation">
+          <a href="#designer-section">Designer</a>
+          <a href="#quoter-section">Quoter</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Designer section mount point -->
+      <section id="designer-section" class="panel panel-designer">
+        <!-- initDesigner(rootEl) will render into here -->
+      </section>
+
+      <!-- Quoter section mount point -->
+      <section id="quoter-section" class="panel panel-quoter">
+        <!-- initQuoter(rootEl) will render into here -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Hub JS that wires in the individual sections -->
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
