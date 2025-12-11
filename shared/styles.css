@@ -40,12 +40,13 @@ body {
   backdrop-filter: blur(10px);
   background: var(--bkgd2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 15px;
 }
 
 .site-header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.5rem 1.5rem;
+  padding: clamp(0.75rem, 1vw, 1.35rem) 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -131,6 +132,7 @@ body {
 }
 
 .site-logo {
+  position: relative;
   height: clamp(58px, 10vw, 116px);
   aspect-ratio: 865.85 / 155.91;
   max-width: 100%;
@@ -153,6 +155,18 @@ body {
           mask-position: center;
   -webkit-mask-size: contain;
           mask-size: contain;
+}
+
+.site-logo-subtitle {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.6rem);
+  font-size: clamp(0.9rem, 1.3vw, 1.20rem);
+  letter-spacing: 0.12em;
+  color: currentColor;
+  line-height: 1.1;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 
@@ -180,6 +194,10 @@ main {
   width: 100%;
 }
 
+.section-linkout {
+  display: none;
+}
+
 .gallery-collection {
   display: grid;
   gap: 2rem;
@@ -200,6 +218,26 @@ main {
 .gallery-block-title {
   font-weight: 700;
   font-size: 1.4rem;
+}
+
+.about-content .wave {
+  display: block;
+  width: 100%;
+  max-width: 580px;
+  height: 10px;
+  margin: 0 0 0.75rem 0;
+  stroke: currentColor;
+}
+
+.about-content .wave path {
+  stroke: currentColor;
+  stroke-width: 4;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .gallery-carousel {
