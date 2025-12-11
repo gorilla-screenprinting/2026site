@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Capriola&display=swap');
+
 :root {
   /* Global color tokens */
   --bkgd1: #f7e16d;
@@ -19,9 +21,9 @@ html, body {
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bkgd1);
-  color: var(--type1);
+  color: var(--acct2);
 }
 
 .site-root {
@@ -90,7 +92,7 @@ body {
   top: calc(100% + 0.5rem);
   min-width: 180px;
   background: var(--bkgd2);
-  color: var(--type1);
+  color: var(--acct2);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
@@ -163,7 +165,7 @@ main {
   width: 100%;
   padding: 4rem 1.5rem;
   background: var(--section-bg, var(--bkgd1));
-  color: var(--section-color, var(--type1));
+  color: var(--section-color, var(--acct2));
   font-weight: var(--section-weight, 400);
   scroll-margin-top: 90px; /* offset for sticky header */
 }
@@ -176,6 +178,169 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+.gallery-collection {
+  display: grid;
+  gap: 2rem;
+}
+
+.gallery-block {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.gallery-block-title {
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.gallery-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-radius: 0;
+  background: transparent;
+  margin-bottom: 0.2rem;
+}
+
+.gallery-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0;
+}
+
+.gallery-action {
+  background: transparent;
+  color: var(--acct2);
+  border: none;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+  transition: transform 120ms ease, opacity 120ms ease;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+}
+
+.gallery-action svg {
+  width: 2.4rem;
+  height: 2.4rem;
+  stroke: currentColor;
+  stroke-width: 8;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.gallery-action:hover {
+  transform: translateY(-1px);
+  opacity: 0.85;
+}
+
+.gallery-action:focus-visible {
+  outline: 2px solid var(--acct2);
+  outline-offset: 2px;
+}
+
+.gallery-track {
+  display: flex;
+  gap: 0;
+  transition: transform 320ms ease;
+  touch-action: pan-y;
+}
+
+.gallery-slide {
+  flex: 0 0 auto;
+  cursor: pointer;
+  user-select: none;
+}
+
+.gallery-img {
+  display: block;
+  height: 260px;
+  width: auto;
+}
+
+.gallery-title {
+  padding: 0.75rem 0.5rem 1.25rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 2000;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox-content {
+  position: relative;
+  background: var(--bkgd2);
+  color: var(--type1);
+  max-width: 960px;
+  width: min(90vw, 960px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
+}
+
+.lightbox img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.lightbox-caption {
+  padding: 1rem 1.25rem 1.25rem;
+  font-weight: 700;
+  color: var(--type1);
+  font-size: 1.4rem;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.lightbox-close:focus-visible {
+  outline: 2px solid var(--type2);
+  outline-offset: 2px;
+}
+
+body.no-scroll {
+  overflow: hidden;
 }
 
 .site-footer {
@@ -194,4 +359,5 @@ main {
   gap: 1rem;
   flex-wrap: wrap;
   font-weight: 600;
+  color: inherit;
 }
