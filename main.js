@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   initGallery();
+  initLogoMarquee();
 
   function initGallery() {
     const carousels = Array.from(document.querySelectorAll('.gallery-carousel[data-gallery-id]'));
@@ -462,5 +463,195 @@ document.addEventListener('DOMContentLoaded', () => {
 
       return { open, close };
     }
+  }
+
+  function initLogoMarquee() {
+    const carousels = Array.from(document.querySelectorAll('.logo-carousel[data-logo-gallery]'));
+    if (!carousels.length) return;
+
+    const makeDataUri = (label) => {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#ffda00'/><stop offset='100%' stop-color='#008776'/></linearGradient></defs><rect width='600' height='300' fill='url(#g)'/><text x='50%' y='55%' fill='#004153' font-family='Capriola,Arial,sans-serif' font-size='48' text-anchor='middle' dominant-baseline='middle' opacity='0.9'>${label}</text></svg>`;
+      return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    };
+
+    const logoConfig = {
+      'apparel-logos': {
+        folder: './assets/gallery/logos/',
+        items: [
+          
+          { title: 'AS Colour', file: 'asc.png', url: 'https://www.ascolour.com/' },
+          { title: 'Next Level', file: 'nla.png', url: 'https://www.ssactivewear.com/ps/next_level#__plpGrid' },
+          { title: 'Adidas', file: 'adi.png', url: 'https://www.ssactivewear.com/ps/adidas#__plpGrid' },
+          { title: 'Comfort Colors', file: 'cco.png', url: 'https://www.ssactivewear.com/ps/comfort_colors#__plpGrid' },
+          { title: 'Red Kap', file: 'red.png', url: 'https://www.sanmar.com/Brands/Red-Kap/c/bra-redkap?perPage=48&sortCriteria=relevance' },
+          { title: 'District', file: 'dis.png', url: 'https://www.sanmar.com/Brands/District/c/bra-district?perPage=48&sortCriteria=relevance' },
+          { title: 'Carhartt', file: 'car.png', url: 'https://www.sanmar.com/Brands/Carhartt/c/bra-carhartt?perPage=48&sortCriteria=relevance' },
+          { title: 'Champion', file: 'cha.png', url: 'https://www.sanmar.com/Brands/Champion/c/bra-champion?perPage=48&sortCriteria=relevance' },
+          { title: 'Dri-Duck', file: 'dri.png', url: 'https://www.ssactivewear.com/ps/dri_duck' },
+          { title: 'Russell', file: 'rus.png', url: 'https://www.ssactivewear.com/ps/russell_athletic' },
+          { title: 'LA Apparel', file: 'laa.png', url: 'https://www.losangelesapparel-imprintable.net/New/New/' },
+          { title: 'Independent Trading', file: 'itc.png', url: 'https://www.ssactivewear.com/ps/independent_trading_co#__plpGrid' },
+        ],
+      },
+    };
+
+    carousels.forEach((carousel) => {
+      const id = carousel.dataset.logoGallery;
+      const config = logoConfig[id] || { items: [] };
+      const track = carousel.querySelector('.logo-track');
+      if (!track) return;
+
+      const baseItems =
+        (config.items && config.items.length)
+          ? config.items.map((it) => ({
+              title: it.title || 'Logo',
+              src: it.file ? encodeURI(`${config.folder || ''}${it.file}`) : makeDataUri(it.title || 'Logo'),
+              url: it.url || '#',
+            }))
+          : [{ title: 'Logo', src: makeDataUri('Logo'), url: '#' }];
+
+      const slidesPerSet = baseItems.length;
+      const repeatCount = 4;
+
+      const createSlide = (item) => {
+        const slide = document.createElement('div');
+        slide.className = 'logo-slide';
+        const link = document.createElement('a');
+        link.href = item.url || '#';
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        const img = document.createElement('img');
+        img.className = 'logo-img';
+        img.alt = item.title || 'Brand logo';
+        img.src = item.src;
+        img.addEventListener('error', () => {
+          if (img.dataset.fallback) return;
+          img.dataset.fallback = '1';
+          img.src = makeDataUri(item.title || 'Logo');
+        });
+        link.appendChild(img);
+        slide.appendChild(link);
+        return slide;
+      };
+
+      track.innerHTML = '';
+      for (let r = 0; r < repeatCount; r += 1) {
+        baseItems.forEach((item) => track.appendChild(createSlide(item)));
+      }
+
+      let baseWidth = 0;
+      let offset = 0;
+      let rafId = null;
+      let lastTs = 0;
+      const speed = 12; // px per second (slow drift)
+      let isDragging = false;
+      let dragStartX = 0;
+      let dragStartOffset = 0;
+
+      const measureBaseWidth = () => {
+        const slides = Array.from(track.children).slice(0, slidesPerSet);
+        baseWidth = slides.reduce((sum, s) => sum + s.getBoundingClientRect().width, 0);
+        if (baseWidth <= 0) baseWidth = 1;
+      };
+
+      const step = (ts) => {
+        if (!lastTs) lastTs = ts;
+        const dt = (ts - lastTs) / 1000;
+        lastTs = ts;
+        offset -= speed * dt;
+        if (baseWidth > 0 && -offset >= baseWidth) {
+          offset += baseWidth;
+        }
+        track.style.transform = `translateX(${offset}px)`;
+        rafId = requestAnimationFrame(step);
+      };
+
+      const stop = () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      };
+
+      const start = () => {
+        if (rafId) return;
+        measureBaseWidth();
+        lastTs = 0;
+        rafId = requestAnimationFrame(step);
+      };
+
+      const handleResize = () => {
+        const currentSlideCount = track.children.length;
+        if (currentSlideCount < slidesPerSet * repeatCount) return;
+        measureBaseWidth();
+      };
+
+      const imgs = Array.from(track.querySelectorAll('img'));
+      let loaded = 0;
+      const onImgReady = () => {
+        loaded += 1;
+        if (loaded === imgs.length) {
+          measureBaseWidth();
+          start();
+        }
+      };
+
+      if (!imgs.length) {
+        measureBaseWidth();
+        start();
+      } else {
+        imgs.forEach((img) => {
+          if (img.complete) {
+            onImgReady();
+          } else {
+            img.addEventListener('load', onImgReady, { once: true });
+            img.addEventListener('error', onImgReady, { once: true });
+          }
+        });
+      }
+
+      window.addEventListener('resize', () => {
+        measureBaseWidth();
+      });
+
+      // Touch drag to nudge the marquee on mobile
+      const onPointerDown = (e) => {
+        if (e.pointerType && e.pointerType !== 'touch') return;
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartOffset = offset;
+        stop();
+        track.style.transition = 'none';
+        track.setPointerCapture(e.pointerId);
+      };
+
+      const onPointerMove = (e) => {
+        if (e.pointerType && e.pointerType !== 'touch') return;
+        if (!isDragging) return;
+        const delta = e.clientX - dragStartX;
+        track.style.transform = `translateX(${dragStartOffset + delta}px)`;
+      };
+
+      const onPointerUp = (e) => {
+        if (e.pointerType && e.pointerType !== 'touch') return;
+        if (!isDragging) return;
+        track.releasePointerCapture(e.pointerId);
+        const delta = e.clientX - dragStartX;
+        offset = dragStartOffset + delta;
+        if (baseWidth > 0) {
+          while (-offset >= baseWidth) offset += baseWidth;
+          while (offset > 0) offset -= baseWidth;
+        }
+        track.style.transform = `translateX(${offset}px)`;
+        isDragging = false;
+        start();
+      };
+
+      track.addEventListener('pointerdown', onPointerDown);
+      track.addEventListener('pointermove', onPointerMove);
+      track.addEventListener('pointerup', onPointerUp);
+      track.addEventListener('pointerleave', onPointerUp);
+      track.addEventListener('pointercancel', onPointerUp);
+    });
   }
 });
