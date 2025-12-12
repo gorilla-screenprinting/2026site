@@ -53,6 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
     list.appendChild(li);
   });
 
+  // Add external link directly
+  const externalLi = document.createElement('li');
+  const externalLink = document.createElement('a');
+  externalLink.textContent = 'Custom Tees Now!';
+  externalLink.href = 'https://designer.gorillaprintshop.com';
+  externalLink.target = '_blank';
+  externalLink.rel = 'noreferrer';
+  externalLink.addEventListener('click', () => closeDrawer());
+  externalLi.appendChild(externalLink);
+  list.appendChild(externalLi);
+
   toggle.setAttribute('aria-expanded', 'false');
   toggle.addEventListener('click', () => {
     if (drawer.hidden) {
@@ -91,13 +102,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleries = [
       {
         id: 'gallery1',
-        title: 'Gallery 1',
+        title: 'Custom Work',
         folder: './assets/gallery/gallery1/',
-        files: [],
+        files: [
+          'T2BEER.webp',
+          'towels.webp',
+          'LOWOWL.webp',
+          'SLOWCLOSEBOAT.webp',
+          'nwferry.webp',
+          'RECKELSS.webp',
+          'IMG_1254.webp',
+          'IMG_1336.webp',
+          'IMG_1272.webp',
+        ],
       },
       {
         id: 'gallery2',
-        title: 'Gorilla Tees',
+        title: 'Gorilla Gear',
         folder: './assets/gallery/gallery2/',
         files: [
           "Banana Split Fountain.png",
@@ -209,9 +230,16 @@ document.addEventListener('DOMContentLoaded', () => {
       let baseTranslate = 0;
       let lastX = 0;
 
+      const getCenteredOffset = (index) => {
+        const slidePos = positions[index] || 0;
+        const slideW = slideWidths[index] || 0;
+        const viewW = carousel.getBoundingClientRect().width;
+        return -(slidePos - (viewW - slideW) / 2);
+      };
+
       const setPosition = (instant = false) => {
         track.style.transition = instant ? 'none' : 'transform 320ms ease';
-        const offset = positions[currentIndex] !== undefined ? -positions[currentIndex] : 0;
+        const offset = getCenteredOffset(currentIndex);
         track.style.transform = `translateX(${offset}px)`;
         wrapToMiddle();
       };
@@ -260,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = true;
         startX = e.clientX;
         lastX = startX;
-        baseTranslate = -(positions[currentIndex] || 0);
+        baseTranslate = getCenteredOffset(currentIndex);
         track.style.transition = 'none';
         track.setPointerCapture(e.pointerId);
         suppressClick = false;
@@ -289,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let nearestIndex = currentIndex;
         let minDist = Infinity;
         for (let i = 0; i < positions.length; i += 1) {
-          const dist = Math.abs(-positions[i] - targetTranslate);
+          const dist = Math.abs(getCenteredOffset(i) - targetTranslate);
           if (dist < minDist) {
             minDist = dist;
             nearestIndex = i;
