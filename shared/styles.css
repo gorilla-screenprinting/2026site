@@ -378,6 +378,7 @@ main {
     width: 100vw;
     height: auto;
     max-height: calc(100vh - var(--lightbox-caption-h));
+    max-width: 100vw;
   }
 }
 

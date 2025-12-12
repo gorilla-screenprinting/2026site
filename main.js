@@ -105,15 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'Custom Work',
         folder: './assets/gallery/gallery1/',
         files: [
-          'T2BEER.webp',
-          'towels.webp',
-          'LOWOWL.webp',
+          
+          'Sunday Drive Kitchen Towel.webp',
+          'Kimoji x Reckless.webp',
           'SLOWCLOSEBOAT.webp',
-          'nwferry.webp',
-          'RECKELSS.webp',
-          'IMG_1254.webp',
-          'IMG_1336.webp',
-          'IMG_1272.webp',
+          'LOW OWL.webp',
+          'The Oatmeal Mantis Shrimp.webp',
+          'T2BEER.webp',
+          'NWR Kraken Ferry.webp',
+          'Grundens Neon Camo.webp',
+          'Sim Process.webp'
         ],
       },
       {
@@ -124,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
           "Banana Split Fountain.png",
           'The Truth is in Here.png',
           'St. Squeegee.png',
-          'Discharge is.png',
+          'Discharge Wasteland.png',
           'Pray for Registration.png',
           "It's the Beer.png",
         ],
@@ -392,9 +393,41 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       document.body.appendChild(lightbox);
 
+      const lightboxContent = lightbox.querySelector('.lightbox-content');
       const lightboxImg = lightbox.querySelector('img');
       const lightboxCaption = lightbox.querySelector('.lightbox-caption');
       const lightboxClose = lightbox.querySelector('.lightbox-close');
+
+      const getCaptionHeight = () => {
+        const rootStyles = getComputedStyle(document.documentElement);
+        const varVal = parseFloat(rootStyles.getPropertyValue('--lightbox-caption-h'));
+        return Number.isFinite(varVal) && varVal > 0 ? varVal : 72;
+      };
+
+      const fitToViewport = () => {
+        if (lightbox.hidden) return;
+        const naturalW = lightboxImg.naturalWidth || 1;
+        const naturalH = lightboxImg.naturalHeight || 1;
+        const captionH = getCaptionHeight();
+        const availableW = window.innerWidth;
+        const availableH = Math.max(window.innerHeight - captionH, 50);
+        const scale = Math.min(availableW / naturalW, availableH / naturalH);
+        const renderW = Math.max(1, Math.round(naturalW * scale));
+        const renderH = Math.max(1, Math.round(naturalH * scale));
+
+        lightboxContent.style.width = `${renderW}px`;
+        lightboxContent.style.maxWidth = `${availableW}px`;
+        lightboxImg.style.width = `${renderW}px`;
+        lightboxImg.style.height = `${renderH}px`;
+        lightboxCaption.style.width = `${renderW}px`;
+        lightboxCaption.style.maxWidth = `${renderW}px`;
+        lightboxCaption.style.left = '0';
+        lightboxCaption.style.transform = 'none';
+      };
+
+      const syncOnLoad = () => fitToViewport();
+      lightboxImg.addEventListener('load', syncOnLoad);
+      window.addEventListener('resize', fitToViewport);
 
       const open = (item, captionText) => {
         lightboxImg.src = item.src;
@@ -402,6 +435,12 @@ document.addEventListener('DOMContentLoaded', () => {
         lightboxCaption.textContent = captionText || item.title;
         lightbox.hidden = false;
         document.body.classList.add('no-scroll');
+        const ensureSync = () => requestAnimationFrame(fitToViewport);
+        if (lightboxImg.complete) {
+          ensureSync();
+        } else {
+          lightboxImg.addEventListener('load', ensureSync, { once: true });
+        }
       };
 
       const close = () => {
