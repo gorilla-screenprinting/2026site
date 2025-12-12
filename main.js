@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let startX = 0;
       let baseTranslate = 0;
       let lastX = 0;
+      let dragStartTime = 0;
 
       const getCenteredOffset = (index) => {
         const slidePos = positions[index] || 0;
@@ -290,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = true;
         startX = e.clientX;
         lastX = startX;
+        dragStartTime = performance.now();
         baseTranslate = getCenteredOffset(currentIndex);
         track.style.transition = 'none';
         track.setPointerCapture(e.pointerId);
@@ -299,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const onPointerMove = (e) => {
         if (e.pointerType && e.pointerType !== 'touch') return;
         if (!isDragging) return;
+        e.preventDefault();
         lastX = e.clientX;
         const delta = lastX - startX;
         lastDragDistance = delta;
@@ -312,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         track.releasePointerCapture(e.pointerId);
         isDragging = false;
         const delta = (lastX || e.clientX) - startX;
+        const dragDuration = Math.max(1, performance.now() - dragStartTime);
         lastDragDistance = delta;
 
         // Find nearest slide based on current translate
@@ -325,7 +329,23 @@ document.addEventListener('DOMContentLoaded', () => {
             nearestIndex = i;
           }
         }
-        currentIndex = nearestIndex;
+        // Detect flick to advance multiple slides
+        const avgWidth =
+          slideWidths.length > 0
+            ? slideWidths.reduce((s, w) => s + w, 0) / slideWidths.length
+            : 1;
+        const isFlick = Math.abs(delta) > 30 && dragDuration < 250;
+        if (isFlick) {
+          const rawSteps = delta / avgWidth;
+          const steps =
+            Math.abs(rawSteps) < 0.4
+              ? Math.sign(rawSteps)
+              : Math.round(rawSteps);
+          const boundedSteps = Math.max(-3, Math.min(3, steps));
+          currentIndex += boundedSteps > 0 ? -boundedSteps : Math.abs(boundedSteps);
+        } else {
+          currentIndex = nearestIndex;
+        }
         setPosition();
         // allow click after this tick
         setTimeout(() => {
