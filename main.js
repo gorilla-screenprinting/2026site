@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleries = [
       {
         id: 'gallery1',
-        title: 'Custom Work',
+        title: 'Client Work',
         folder: './assets/gallery/gallery1/',
         files: [
           
@@ -648,6 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const onPointerMove = (e) => {
         if (e.pointerType && e.pointerType !== 'touch') return;
         if (!isDragging) return;
+        e.preventDefault();
         const delta = e.clientX - dragStartX;
         track.style.transform = `translateX(${dragStartOffset + delta}px)`;
       };
