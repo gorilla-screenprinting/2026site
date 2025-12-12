@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  initLogoVariants();
   initGallery();
   initLogoMarquee();
   initIframeResizer();
@@ -124,12 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'Gorilla Gear',
         folder: './assets/gallery/gallery2/',
         files: [
-          "Banana Split Fountain.png",
+          "It's the Beer.png", 
           'The Truth is in Here.png',
+          'Banana Split Fountain.png',
+          'Like Runts but all bananas.png',
           'St. Squeegee.png',
+          'Essentials Tote.png',
           'Discharge Wasteland.png',
-          'Pray for Registration.png',
-          "It's the Beer.png",
+          'Pray for Registration.png'
+          
         ],
       },
       {
@@ -722,5 +726,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // initial attempt in case message hasn't arrived yet
     requestAnimationFrame(measureFromContent);
     setTimeout(measureFromContent, 300);
+  }
+
+  function initLogoVariants() {
+    const logoEl = document.querySelector('.site-logo');
+    if (!logoEl) return;
+
+    const variants = [
+      '/assets/header-logo.svg',
+      '/assets/header-logo-2.svg',
+      '/assets/header-logo-3.svg',
+      '/assets/header-logo-4.svg',
+    ];
+
+    const setVariant = (path) => {
+      logoEl.style.setProperty('--logo-mask', `url("${path}")`);
+    };
+
+    const pickRandom = (exclude) => {
+      const pool = variants.filter((v) => v !== exclude);
+      if (!pool.length) return exclude || variants[0];
+      const idx = Math.floor(Math.random() * pool.length);
+      return pool[idx];
+    };
+
+    let current = pickRandom();
+    setVariant(current);
+
+    logoEl.addEventListener('click', () => {
+      const next = pickRandom(current);
+      current = next;
+      setVariant(next);
+    });
   }
 });

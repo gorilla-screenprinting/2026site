@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================
   const dvdEmoji = document.getElementById('dvd-emoji');
 
+  const toggleBtn = document.getElementById('banana-toggle');
+
   if (dvdEmoji) {
     const bounds = () => {
       const w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
@@ -16,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let y = Math.random() * Math.max(1, bh - dvdEmoji.offsetHeight);
     let vx = 0.08; // px per ms horizontally
     let vy = 0.06; // px per ms vertically
+
+    let isRunning = false;
 
     function dvdStep(ts) {
       if (!dvdStep.last) dvdStep.last = ts;
@@ -42,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       dvdEmoji.style.transform = `translate(${x}px, ${y}px)`;
 
-      requestAnimationFrame(dvdStep);
+      if (isRunning) requestAnimationFrame(dvdStep);
     }
 
     window.addEventListener('resize', () => {
@@ -51,7 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
       y = Math.min(Math.max(0, y), Math.max(0, h - dvdEmoji.offsetHeight));
     });
 
-    requestAnimationFrame(dvdStep);
+    if (toggleBtn) {
+      // initialize off
+      dvdEmoji.style.opacity = '0';
+
+      toggleBtn.addEventListener('click', () => {
+        isRunning = !isRunning;
+        const pressed = isRunning;
+        toggleBtn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+        dvdEmoji.style.opacity = pressed ? '0.8' : '0';
+        if (pressed) {
+          dvdStep.last = undefined;
+          requestAnimationFrame(dvdStep);
+        }
+      });
+    }
   }
 
 

@@ -41,13 +41,13 @@ body {
   backdrop-filter: blur(10px);
   background: var(--bkgd2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 20px;
+  padding-bottom: 30px;
 }
 
 .site-header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: clamp(0.7rem, 1vw, 1.1rem) 1.1rem;
+  padding: clamp(0.9rem, 1vw, 1.1rem) 1.1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -133,11 +133,13 @@ body {
 }
 
 .site-logo {
+  --logo-mask: url("/assets/header-logo.svg");
   position: relative;
   height: clamp(58px, 10vw, 116px);
   aspect-ratio: 865.85 / 155.91;
   max-width: 100%;
   color: var(--acct2);        /* THIS sets the logo color */
+  cursor: pointer;
 }
 
 .site-logo::before {
@@ -148,8 +150,8 @@ body {
 
   background-color: currentColor;
 
-  -webkit-mask-image: url("/assets/header-logo.svg");
-          mask-image: url("/assets/header-logo.svg");
+  -webkit-mask-image: var(--logo-mask);
+          mask-image: var(--logo-mask);
   -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
   -webkit-mask-position: center;
@@ -165,11 +167,12 @@ body {
   font-size: clamp(0.9rem, 1.3vw, 1.20rem);
   letter-spacing: 0.12em;
   color: currentColor;
-  line-height: 1.1;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;
+  padding-bottom: 0.1rem;
 }
 
 @media (max-width: 480px) {
@@ -220,6 +223,10 @@ main {
 .gallery-collection {
   display: grid;
   gap: 2rem;
+}
+
+.custom-tote-content {
+  margin-bottom: 3rem;
 }
 
 .gallery-block {
@@ -278,7 +285,7 @@ main {
 
 .gallery-action {
   background: transparent;
-  color: var(--acct2);
+  color: var(--section-color, var(--acct2));
   border: none;
   padding: 0.4rem 0.6rem;
   cursor: pointer;
@@ -305,7 +312,7 @@ main {
 }
 
 .gallery-action:focus-visible {
-  outline: 2px solid var(--acct2);
+  outline: 2px solid var(--section-color, var(--acct2));
   outline-offset: 2px;
 }
 
@@ -508,6 +515,8 @@ body.no-scroll {
 
 h2 { margin: 0.5rem 0 1rem; }
 p  { margin: 0.5rem 0 1rem; }
+a  { color: var(--acct2); }
+a:hover, a:focus-visible { color: var(--acct2); }
 
 .embedded-wrap {
   width: 100%;
