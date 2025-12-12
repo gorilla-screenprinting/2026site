@@ -1,0 +1,297 @@
+/* ========================
+   Tokens / Theme
+======================== */
+:root {
+  --bg: #f5f0c3;      /* matches site bkgd2 (lighter) */
+  --panel: #004153;   /* matches site type1 (dark blue) */
+  --text: #ffda00;    /* matches site acct1 (yellow) */
+  --muted: #008776;   /* matches site acct2 (turquoise) */
+  --accent: #ff2a5f;  /* matches site type2 (pink) */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --gap: 16px;
+  --control-h: 2.6rem;
+  --pad-x: .6em;
+  --shadow: 0 10px 10px rgba(5, 61, 48, 0.2);
+}
+
+/* ========================
+   Motion Safety
+======================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================
+   Reset / Base
+======================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: auto;
+}
+
+body {
+  background: var(--bg);
+  color: var(--panel);
+  font-family: "Bagel Fat One", "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+/* Accessible focus */
+:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ========================
+   Form Inputs
+======================== */
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius);
+  background: #f7e16d; /* site bkgd1 */
+  color: var(--muted);
+  font-family: inherit;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+/* Labels */
+label {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+/* ========================
+   Buttons
+======================== */
+button {
+  display: inline-block;
+  padding: .5em .5em;
+  border: none;
+  border-radius: var(--radius);
+  font-family: "Bagel Fat One", "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: var(--muted);
+  color: var(--panel);
+  transition: background .2s, transform .1s;
+  margin-top: 0.6rem;
+}
+
+button.primary {
+  background: var(--text);
+  color: var(--panel);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--text);
+}
+
+button:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--panel);
+}
+
+button:active:not(:disabled) {
+  transform: scale(.96);
+  background: var(--text);
+  color: var(--accent);
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ========================
+   Layout Helpers
+======================== */
+
+.container {
+  width: 100%;
+  padding: 2rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.quote-shell {
+  width: min(600px, 90%);
+  margin: 0 auto;
+}
+
+/* Hero heading block */
+.quote-heading {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Each hero line is independently auto-sized via JS */
+.hero-fit {
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1;
+  color: var(--panel);
+}
+
+/* Card title uses JS fitter too */
+.fit-heading {
+  display: block;
+  white-space: normal;
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 1.05;
+  text-align: left;
+  font-family: "Bagel Fat One", "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--muted);
+}
+
+/* Card container */
+.card {
+  background: var(--bg);
+  color: var(--panel);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Button row at bottom */
+.button-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.button-row button {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Product label above each outlined box */
+.product-label {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+
+/* Product box */
+.orderLine {
+  margin-top: 1.3rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--accent);
+}
+
+/* Garment row: wide text, narrow quantity */
+.garmentType {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.garmentType label {
+  min-width: 0;
+}
+
+.garmentType label:first-child {
+  flex: 1 1 72%;
+}
+
+.garmentType label:last-child {
+  flex: 0 0 24%;
+}
+
+/* Placement row: 3/4 placement, 1/4 # of colors */
+.printPlacement {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.printPlacement label:first-child {
+  flex: 3 1 0;
+}
+
+.printPlacement label:last-child {
+  flex: 1 1 0;
+}
+
+/* Single-line fields: text, email, number, selects */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select {
+  font-size: 1rem;
+  height: 2.6rem;
+  padding: 0 12px;
+  line-height: 2.6rem;
+}
+
+/* Textarea can stay flexible */
+textarea {
+  font-size: 1.3rem;
+  line-height: 1.3;
+  padding: 10px 12px;
+}
+
+/* Floating background emoji (DVD-style) */
+#dvd-emoji {
+  position: fixed;
+  top: 0;
+  left: 0;
+  font-size: 200px;
+  width: 200px;
+  height: 200px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: 0;
+}
+
+
+/* ========================
+   Mobile
+======================== */
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem 0;
+  }
+  .button-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .button-row button {
+    width: 100%;
+  }
+}

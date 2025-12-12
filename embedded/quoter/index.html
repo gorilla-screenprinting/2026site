@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gorilla Quoter</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="quote-shell">
+
+      <div class="card">
+        <h1 class="fit-heading">Get A Basic Quote</h1>
+
+        <form id="myForm"
+          action="https://script.google.com/macros/s/AKfycbzJNzT0P59sXflEMxhtjN4vqgV3FbIgLxtHomj2UO4rmCUp4ziUjAUR0QoNiCJtPoZU/exec"
+          method="post">
+
+          <!-- honeypot -->
+          <div style="display:none;">
+            <label>Leave this field blank:
+              <input type="text" name="companyWebsite" autocomplete="off" tabindex="-1">
+            </label>
+          </div>
+          <input type="hidden" name="formStart" id="formStart" value="">
+
+          <!-- customer info -->
+          <label>Your name:
+            <input type="text" name="customerName" required>
+          </label>
+
+          <label>Your email:
+            <input type="email" name="customerEmail" required>
+          </label>
+
+          <label>Your deadline &amp; must-haves:
+            <input type="text" name="notes" required>
+          </label>
+
+          <!-- dynamic products -->
+          <div id="orderLines"></div>
+
+          <div class="button-row">
+            <button type="button" id="addProduct">Add New Product</button>
+            <button class="primary" type="submit">Submit Quote Request</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="dvd-emoji" aria-hidden="true">🍌</div>
+  <script>
+    const postHeight = () => {
+      const container = document.querySelector('.container');
+      const rect = container?.getBoundingClientRect();
+      const measured = rect ? Math.ceil(rect.height) : 0;
+      const fallback = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+      const height = Math.max(measured, fallback);
+      window.parent.postMessage({ type: 'embedded-height', height }, '*');
+    };
+    window.addEventListener('load', () => requestAnimationFrame(postHeight));
+    window.addEventListener('resize', () => requestAnimationFrame(postHeight));
+    const observer = new MutationObserver(() => {
+      requestAnimationFrame(postHeight);
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    window.addEventListener('message', (event) => {
+      const { type } = event.data || {};
+      if (type === 'request-height') {
+        postHeight();
+      }
+    });
+    // Report every animation frame while the card is on screen to keep the parent in sync
+    const tick = () => {
+      requestAnimationFrame(() => postHeight());
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  </script>
+</body>
+
+</html>

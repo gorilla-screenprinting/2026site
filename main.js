@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initGallery();
   initLogoMarquee();
+  initIframeResizer();
 
   function initGallery() {
     const carousels = Array.from(document.querySelectorAll('.gallery-carousel[data-gallery-id]'));
@@ -674,5 +675,52 @@ document.addEventListener('DOMContentLoaded', () => {
       track.addEventListener('pointerleave', onPointerUp);
       track.addEventListener('pointercancel', onPointerUp);
     });
+  }
+
+  function initIframeResizer() {
+    const quoterFrame = document.getElementById('quoter-embed');
+    if (!quoterFrame) return;
+
+    const measureFromContent = () => {
+      try {
+        const doc = quoterFrame.contentDocument || quoterFrame.contentWindow?.document;
+        const h = doc?.documentElement?.scrollHeight || doc?.body?.scrollHeight;
+        if (h && Number.isFinite(h)) {
+          quoterFrame.style.height = `${h}px`;
+        }
+      } catch (e) {
+        // ignore cross-origin issues
+      }
+    };
+
+    const resizeHandler = (event) => {
+      const { type, height } = event.data || {};
+      const fromFrame = event.source === quoterFrame.contentWindow;
+      const sameOrigin = event.origin === window.location.origin || event.origin === 'null';
+      if (!fromFrame && !sameOrigin) return;
+
+      if (type === 'embedded-height' && Number.isFinite(height) && height > 0) {
+        quoterFrame.style.height = `${height}px`;
+      }
+    };
+
+    window.addEventListener('message', resizeHandler);
+    window.addEventListener('resize', () => {
+      // force shrink then remeasure
+      quoterFrame.style.height = '1px';
+      requestAnimationFrame(() => {
+        measureFromContent();
+      });
+      // ask iframe to report its own height
+      if (quoterFrame.contentWindow) {
+        quoterFrame.contentWindow.postMessage({ type: 'request-height' }, '*');
+      }
+      setTimeout(() => {
+        measureFromContent();
+      }, 200);
+    });
+    // initial attempt in case message hasn't arrived yet
+    requestAnimationFrame(measureFromContent);
+    setTimeout(measureFromContent, 300);
   }
 });
