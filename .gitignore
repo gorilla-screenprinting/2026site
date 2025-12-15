@@ -23,3 +23,7 @@ Icon?
 # macOS cache files
 *.swp
 *.swo
+
+
+# dirs i don't need to share
+*/templates

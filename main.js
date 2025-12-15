@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
           "It's the Beer.png", 
           'The Truth is in Here.png',
           'Banana Split Fountain.png',
-          'Like Runts but all bananas.png',
+          'Like Runts Except All Bananas.png',
           'St. Squeegee.png',
           'Essentials Tote.png',
           'Discharge Wasteland.png',
