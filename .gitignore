@@ -27,3 +27,9 @@ Icon?
 
 # dirs i don't need to share
 */templates
+# Local Netlify folder
+.netlify
+
+.env
+node_modules/
+.netlify/
