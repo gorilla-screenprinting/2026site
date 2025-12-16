@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "netlify-cli": "^23.12.3"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}

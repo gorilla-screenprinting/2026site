@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   initLogoVariants();
+  initCatalogSearch();
   initGallery();
   initLogoMarquee();
   initIframeResizer();
@@ -758,5 +759,100 @@ document.addEventListener('DOMContentLoaded', () => {
       current = next;
       setVariant(next);
     });
+  }
+
+  function initCatalogSearch() {
+    const section = document.querySelector('.section-catalog');
+    if (!section) return;
+
+    const form = section.querySelector('.catalog-search-form');
+    const input = section.querySelector('#catalog-search-input');
+    const statusEl = section.querySelector('.catalog-status');
+    const resultsEl = section.querySelector('.catalog-results');
+
+    const escapeHtml = (str) => {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    };
+
+    const renderStatus = (text) => {
+      if (statusEl) statusEl.textContent = text || '';
+    };
+
+    const renderResults = (items) => {
+      if (!resultsEl) return;
+      resultsEl.innerHTML = '';
+      if (!items || !items.length) return;
+      items.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'catalog-card-item';
+        const sku = item.styleName || item.title || item.uniqueStyleName || 'Style';
+        const imgSrc = item.styleImage || '';
+        const sizePrices = Array.isArray(item.sizePrices) ? item.sizePrices : null;
+        const colors = Array.isArray(item.colors) ? item.colors : null;
+        card.innerHTML = `
+          ${imgSrc ? `<img class="catalog-card-img" src="${encodeURI(imgSrc)}" alt="${escapeHtml(sku)}">` : ''}
+          <h3>${escapeHtml(sku)}</h3>
+          <div class="meta">
+            <span class="pill">${escapeHtml(item.brandName || 'Brand')}</span>
+          </div>
+          ${sizePrices && sizePrices.length ? `<div class="catalog-sizes">${sizePrices.map(sp => `<span class="pill pill-size">${escapeHtml(sp.label)} ${sp.price ? `$${escapeHtml(sp.price.toFixed ? sp.price.toFixed(2) : sp.price)}` : ''}</span>`).join(' ')}</div>` : ''}
+          ${colors && colors.length ? `<p class="catalog-colors">Colors: ${escapeHtml(colors.slice(0, 8).join(', '))}${colors.length > 8 ? ` +${colors.length - 8} more` : ''}</p>` : ''}
+        `;
+        resultsEl.appendChild(card);
+      });
+    };
+
+    const runSearch = async (q) => {
+      const params = new URLSearchParams();
+      params.set('q', q);
+      renderStatus('Searching S&S…');
+      renderResults([]);
+      try {
+        const res = await fetch(`/.netlify/functions/catalog-search?${params.toString()}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          const msg = data?.error || `Search failed (${res.status})`;
+          renderStatus(msg);
+          return;
+        }
+        if (!data.results || !data.results.length) {
+          renderStatus('No matches yet. Try a different style or brand+style.');
+          return;
+        }
+        renderStatus(`Found ${data.count || data.results.length} result${data.results.length === 1 ? '' : 's'}.`);
+        renderResults(data.results);
+      } catch (err) {
+        renderStatus('Search failed — please try again.');
+      }
+    };
+
+    if (form && input) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const q = (input.value || '').trim();
+        if (!q) {
+          renderStatus('Enter a style or brand + style to search.');
+          renderResults([]);
+          return;
+        }
+        runSearch(q);
+      });
+    }
+
+    function stripHtml(str) {
+      return String(str || '').replace(/<[^>]*>/g, ' ');
+    }
+
+    function decodeHtml(str) {
+      const div = document.createElement('div');
+      div.innerHTML = str;
+      return div.textContent || div.innerText || '';
+    }
+
   }
 });

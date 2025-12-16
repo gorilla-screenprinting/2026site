@@ -1,0 +1,20 @@
+0 verbose cli /usr/local/bin/node /usr/local/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.3.0
+2 info using node@v22.14.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/Volumes/Banana Book/GORILLA APP DEVO/2026 SITE/.npmrc
+5 silly config load:file:/Volumes/Banana Book/GORILLA APP DEVO/2026 SITE/tmp-home/.npmrc
+6 silly config load:file:/usr/local/etc/npmrc
+7 verbose title npm exec netlify build
+8 verbose argv "exec" "--" "netlify" "build"
+9 verbose logfile logs-max:10 dir:/Volumes/Banana Book/GORILLA APP DEVO/2026 SITE/tmp-home/.npm/_logs/2025-12-16T08_34_36_267Z-
+10 verbose logfile /Volumes/Banana Book/GORILLA APP DEVO/2026 SITE/tmp-home/.npm/_logs/2025-12-16T08_34_36_267Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with ENOTFOUND
+13 http fetch GET https://registry.npmjs.org/npm attempt 2 failed with ENOTFOUND
+14 verbose cwd /Volumes/Banana Book/GORILLA APP DEVO/2026 SITE
+15 verbose os Darwin 24.5.0
+16 verbose node v22.14.0
+17 verbose npm  v11.3.0
+18 verbose exit 1
+19 verbose code 1
