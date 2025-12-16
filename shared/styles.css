@@ -225,8 +225,13 @@ main {
   gap: 2rem;
 }
 
-.section-catalog {
+#extra-section.section {
   --section-bg: var(--bkgd2);
+  --section-color: var(--type1);
+}
+
+.section-catalog {
+  --section-bg: var(--bkgd1);
   --section-color: var(--type1);
 }
 
@@ -236,17 +241,19 @@ main {
   border-radius: 16px;
   padding: clamp(1.2rem, 2vw, 1.8rem);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+  color: var(--acct2);
 }
 
 .catalog-head h2 {
   margin: 0 0 0.3rem 0;
   font-size: clamp(1.4rem, 2vw, 1.75rem);
+  color: var(--acct2);
 }
 
 .catalog-head p {
   margin: 0 0 1rem 0;
   max-width: 46ch;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--acct2);
 }
 
 .catalog-search-form {
@@ -258,6 +265,7 @@ main {
 
 .catalog-label {
   font-weight: 600;
+  color: var(--acct2);
 }
 
 .catalog-input-row {
@@ -273,6 +281,7 @@ main {
   border: 1px solid rgba(0, 0, 0, 0.12);
   font: inherit;
   background: #fff;
+  color: var(--acct2);
 }
 
 .catalog-input-row input:focus-visible {
@@ -299,7 +308,7 @@ main {
 
 .catalog-status {
   min-height: 1.25rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--acct2);
   font-size: 0.95rem;
 }
 
@@ -320,31 +329,69 @@ main {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
+.catalog-img-wrap {
+  position: relative;
+}
+
 .catalog-card-img {
   width: 100%;
   height: auto;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, 0.02);
   object-fit: contain;
   aspect-ratio: 4 / 5;
+  display: block;
+}
+
+.catalog-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--acct1);
+  color: var(--type2);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.catalog-nav.prev {
+  left: 8px;
+}
+
+.catalog-nav.next {
+  right: 8px;
+}
+
+.catalog-brandline {
+  font-weight: 600;
+  margin: 0.2rem 0;
+  color: var(--type1);
+}
+
+.catalog-colorline {
+  font-size: 0.95rem;
+  color: var(--type1);
 }
 
 .catalog-card-item h3 {
   margin: 0;
   font-size: 1.05rem;
-  color: var(--type1);
+  color: var(--acct2);
 }
 
 .catalog-card-desc {
   margin: 0.25rem 0 0;
-  color: rgba(0, 0, 0, 0.78);
+  color: var(--acct2);
   font-size: 0.95rem;
   line-height: 1.35;
 }
 
 .catalog-card-item .meta {
   font-size: 0.95rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--acct2);
 }
 
 .catalog-card-item .pill {
@@ -379,6 +426,35 @@ main {
   margin: 0.15rem 0 0;
   font-size: 0.95rem;
   color: rgba(0, 0, 0, 0.78);
+}
+
+.catalog-swatches {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.2rem;
+}
+
+.catalog-swatch {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.catalog-swatch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.catalog-swatch-more {
+  font-weight: 700;
+  color: var(--type1);
 }
 
 .custom-tote-content {
@@ -689,7 +765,9 @@ a:hover, a:focus-visible { color: var(--acct2); }
 }
 
 .section-quoter {
-  padding: 0 0 2rem; /* give breathing room after the embed */
+  --section-bg: var(--bkgd2);
+  --section-color: var(--type1);
+  padding: 0 0 1.5rem; /* give breathing room after the embed */
 }
 
 .section-quoter .section-inner {

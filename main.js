@@ -791,26 +791,87 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('article');
         card.className = 'catalog-card-item';
         const sku = item.styleName || item.title || item.uniqueStyleName || 'Style';
-        const imgSrc = item.styleImage || '';
+        const brand = item.brandName || '';
+        const colors = Array.isArray(item.colorImages) ? item.colorImages : [];
         const sizePrices = Array.isArray(item.sizePrices) ? item.sizePrices : null;
-        const colors = Array.isArray(item.colors) ? item.colors : null;
-        card.innerHTML = `
-          ${imgSrc ? `<img class="catalog-card-img" src="${encodeURI(imgSrc)}" alt="${escapeHtml(sku)}">` : ''}
-          <h3>${escapeHtml(sku)}</h3>
-          <div class="meta">
-            <span class="pill">${escapeHtml(item.brandName || 'Brand')}</span>
-          </div>
-          ${sizePrices && sizePrices.length ? `<div class="catalog-sizes">${sizePrices.map(sp => `<span class="pill pill-size">${escapeHtml(sp.label)} ${sp.price ? `$${escapeHtml(sp.price.toFixed ? sp.price.toFixed(2) : sp.price)}` : ''}</span>`).join(' ')}</div>` : ''}
-          ${colors && colors.length ? `<p class="catalog-colors">Colors: ${escapeHtml(colors.slice(0, 8).join(', '))}${colors.length > 8 ? ` +${colors.length - 8} more` : ''}</p>` : ''}
-        `;
+
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'catalog-img-wrap';
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'catalog-nav prev';
+        prevBtn.textContent = '‹';
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'catalog-nav next';
+        nextBtn.textContent = '›';
+        const imgEl = document.createElement('img');
+        imgEl.className = 'catalog-card-img';
+        imgEl.alt = sku;
+        imgWrap.appendChild(prevBtn);
+        imgWrap.appendChild(imgEl);
+        imgWrap.appendChild(nextBtn);
+
+        const brandLine = document.createElement('div');
+        brandLine.className = 'catalog-brandline';
+        brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+
+        const colorLine = document.createElement('div');
+        colorLine.className = 'catalog-colorline';
+
+        const sizesDiv = document.createElement('div');
+        sizesDiv.className = 'catalog-sizes';
+
+        if (sizePrices && sizePrices.length) {
+          sizePrices.forEach((sp) => {
+            const pill = document.createElement('span');
+            pill.className = 'pill pill-size';
+            pill.textContent = `${sp.label} ${sp.price ? `$${(sp.price.toFixed ? sp.price.toFixed(2) : sp.price)}` : ''}`;
+            sizesDiv.appendChild(pill);
+          });
+        }
+
+        card.appendChild(imgWrap);
+        card.appendChild(brandLine);
+        card.appendChild(colorLine);
+        if (sizesDiv.childNodes.length) {
+          card.appendChild(sizesDiv);
+        }
         resultsEl.appendChild(card);
+
+        let idx = 0;
+        const setImage = (i) => {
+          if (!colors.length) {
+            imgEl.src = item.styleImage || '';
+            colorLine.textContent = '';
+            brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+            return;
+          }
+          idx = (i + colors.length) % colors.length;
+          const c = colors[idx];
+          imgEl.src = c.image || item.styleImage || '';
+          const colorName = c.name || '';
+          colorLine.textContent = colorName ? `Color: ${colorName}` : '';
+          brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+        };
+
+        prevBtn.addEventListener('click', () => setImage(idx - 1));
+        nextBtn.addEventListener('click', () => setImage(idx + 1));
+
+        if (colors.length) {
+          setImage(0);
+        } else if (item.styleImage) {
+          imgEl.src = item.styleImage;
+          colorLine.textContent = '';
+          brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+        }
       });
     };
 
     const runSearch = async (q) => {
       const params = new URLSearchParams();
       params.set('q', q);
-      renderStatus('Searching S&S…');
+      renderStatus('Searching catalog…');
       renderResults([]);
       try {
         const res = await fetch(`/.netlify/functions/catalog-search?${params.toString()}`);

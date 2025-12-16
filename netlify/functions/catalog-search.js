@@ -202,6 +202,7 @@ async function fetchPricing(base, headers, styleID, partNumber, tier, requireSal
     const add = tier === "hoodie" ? 7 : 3.5;
     const byLabel = new Map();
     const colors = new Set();
+    const colorImages = new Map(); // name -> image url
 
     const labelFor = (p) => p.sizePriceCodeName || p.sizePriceCode || p.sizeName || "Default";
     const isWhite = (p) => {
@@ -212,9 +213,28 @@ async function fetchPricing(base, headers, styleID, partNumber, tier, requireSal
       const v = p[field];
       return typeof v === "number" ? v : Number.parseFloat(v);
     };
+    const cdnBase = (process.env.VENDOR_CDN_BASE || "https://cdn.ssactivewear.com/").replace(/\/+$/, "") + "/";
+    const pickImage = (p) => {
+      const src =
+        p.colorFrontImage ||
+        p.colorOnModelFrontImage ||
+        p.colorSwatchImage ||
+        p.colorBackImage ||
+        p.colorSideImage ||
+        p.colorOnModelBackImage ||
+        "";
+      if (!src) return null;
+      return src.startsWith("http") ? src : `${cdnBase}${src.replace(/^\/+/, "")}`;
+    };
 
     for (const p of data) {
-      if (p.colorName) colors.add(p.colorName);
+      if (p.colorName) {
+        colors.add(p.colorName);
+        const img = pickImage(p);
+        if (img && !colorImages.has(p.colorName)) {
+          colorImages.set(p.colorName, img);
+        }
+      }
       const caseCost = rawVal(p, "casePrice") ?? rawVal(p, "caseprice") ?? rawVal(p, "case_price") ?? rawVal(p, "caseQtyPrice") ?? rawVal(p, "caseqtyprice");
       const baseCost = caseCost;
       if (!Number.isFinite(baseCost) || baseCost <= 0) continue;
@@ -276,6 +296,7 @@ async function fetchPricing(base, headers, styleID, partNumber, tier, requireSal
       cost: Number(lowestCost.toFixed(2)),
       sizePrices,
       colors: Array.from(colors).sort(),
+      colorImages: Array.from(colorImages.entries()).map(([name, image]) => ({ name, image })),
     };
   } catch {
     return null;
