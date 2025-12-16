@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>Gorilla Means Quality 🍌</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="./shared/styles.css">
+    <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
@@ -68,13 +68,59 @@
                     <div class="catalog-card">
                         <div class="catalog-head">
                             <h2>Browse our Blanks catalog</h2>
-                            <p>Quick lookup by style or brand+style (e.g., Gildan 2000, Bella 3001).</p>
+                            <p>Know the style number? Drop it in. Or pick a brand and garment type to browse.</p>
                         </div>
                         <form class="catalog-search-form" novalidate>
-                            <label class="catalog-label" for="catalog-search-input">Style or brand + style</label>
-                            <div class="catalog-input-row">
-                                <input id="catalog-search-input" name="q" type="search" placeholder="e.g. Gildan 2000 or Bella 3001" autocomplete="off" required />
-                                <button type="submit">Search</button>
+                            <div class="catalog-row">
+                                <div class="catalog-method">
+                                    <div class="catalog-method-title">Option 1: Style number lookup</div>
+                                    <div class="catalog-field">
+                                        <label class="catalog-label" for="catalog-style-input">If you know the style number, enter it here</label>
+                                        <div class="catalog-input-row">
+                                            <input id="catalog-style-input" name="style" type="search" placeholder="e.g. 2000, 3001, 562M" autocomplete="off" />
+                                            <button type="submit">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="catalog-method">
+                                    <div class="catalog-method-title">Option 2: Browse by brand + style</div>
+                                    <div class="catalog-field catalog-dual-row">
+                                        <div class="catalog-select">
+                                            <label class="catalog-label" for="catalog-brand-select">Brand</label>
+                                            <select id="catalog-brand-select" name="brand">
+                                                <option value="">Any brand</option>
+                                                <option value="Gildan">Gildan</option>
+                                                <option value="Bella Canvas">Bella + Canvas</option>
+                                                <option value="Next Level">Next Level</option>
+                                                <option value="Comfort Colors">Comfort Colors</option>
+                                                <option value="American Apparel">American Apparel</option>
+                                                <option value="Hanes">Hanes</option>
+                                                <option value="Jerzees">Jerzees</option>
+                                                <option value="AS Colour">AS Colour</option>
+                                                <option value="Independent">Independent</option>
+                                                <option value="Tultex">Tultex</option>
+                                                <option value="District">District</option>
+                                                <option value="Port & Company">Port & Company</option>
+                                            </select>
+                                        </div>
+                                        <div class="catalog-select">
+                                            <label class="catalog-label" for="catalog-type-select">Style</label>
+                                            <select id="catalog-type-select" name="styleType">
+                                                <option value="">Any style</option>
+                                                <option value="short sleeve tee">Short sleeve tee</option>
+                                                <option value="long sleeve tee">Long sleeve tee</option>
+                                                <option value="pullover hoodie">Pullover hoodie</option>
+                                                <option value="zip hoodie">Zip hoodie</option>
+                                                <option value="crewneck fleece">Crewneck fleece</option>
+                                                <option value="tote bag">Tote bag</option>
+                                            </select>
+                                        </div>
+                                        <div class="catalog-browse-btn">
+                                            <button type="button" id="catalog-browse-trigger">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                         <div class="catalog-status" aria-live="polite"></div>

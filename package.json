@@ -4,5 +4,8 @@
   },
   "dependencies": {
     "node-fetch": "^2.7.0"
+  },
+  "scripts": {
+    "build:ss-index": "node scripts/build-style-index.js"
   }
 }

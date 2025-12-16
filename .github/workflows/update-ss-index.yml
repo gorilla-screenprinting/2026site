@@ -1,0 +1,43 @@
+name: Update S&S Style Index
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 1 * *" # monthly on the 1st at 06:00 UTC
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build style index
+        env:
+          VENDOR_USERNAME: ${{ secrets.VENDOR_USERNAME }}
+          VENDOR_PASSWORD: ${{ secrets.VENDOR_PASSWORD }}
+        run: npm run build:ss-index
+
+      - name: Commit updated index if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet notes/ss-style-index.json; then
+            echo "No changes to index."
+            exit 0
+          fi
+          git add notes/ss-style-index.json
+          git commit -m "chore: update S&S style index"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

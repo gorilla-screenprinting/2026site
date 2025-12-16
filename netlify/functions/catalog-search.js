@@ -10,7 +10,12 @@ exports.handler = async (event) => {
   }
 
   const preset = "";
+  const brandFilter = (event.queryStringParameters?.brand || "").trim();
+  const typeFilter = (event.queryStringParameters?.type || "").trim();
   let q = (event.queryStringParameters?.q || "").trim();
+  if (!q && (brandFilter || typeFilter)) {
+    q = `${brandFilter} ${typeFilter}`.trim();
+  }
   const isPreset = false;
   if (!q) {
     return json(400, { ok: false, error: "Missing search query (style ID or part number)" });
@@ -36,23 +41,75 @@ exports.handler = async (event) => {
   const numericQ = /^\d+$/.test(q) ? q : null;
   const normQ = normalize(q);
   const queryTokens = Array.from(new Set(q.split(/\s+/).map(normalize).filter(Boolean)));
-  // Treat as strict SKU match only when the query contains a digit
-  const isSkuQuery = /\d/.test(q);
+  // Treat as SKU-style query when it contains a digit and no spaces (or only digits/letters)
+  const isSkuQuery = /\d/.test(q) && !/\s/.test(q);
+  const isNumericOnly = /^\d+$/.test(q);
 
-  // Try style ID if numeric
-  if (numericQ) {
-    urls.add(`${cleanBase}/V2/styles?styleid=${encodeURIComponent(q)}&limit=20&mediatype=json`);
+  // Brand/style browse path: use local index, exact brand/baseCategory match, then fetch pricing
+  if (!isSkuQuery && (brandFilter || typeFilter)) {
+    const index = loadLocalIndex();
+    const matchBrand = (row) => {
+      if (!brandFilter) return true;
+      return String(row.brandName || "").toLowerCase().trim() === brandFilter.toLowerCase().trim();
+    };
+    const matchType = (row) => {
+      if (!typeFilter) return true;
+      return String(row.baseCategory || "").toLowerCase().trim() === typeFilter.toLowerCase().trim();
+    };
+
+    const hits = index.filter((row) => matchBrand(row) && matchType(row));
+
+    const unique = [];
+    const seen = new Set();
+    for (const row of hits) {
+      const key = `${row.styleID || ""}-${row.partNumber || ""}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      unique.push(row);
+    }
+
+    const withPricing = await Promise.all(
+      unique.slice(0, 40).map(async (row) => {
+        const tier = categoryTier(row);
+        const pricing = await fetchPricing(cleanBase, headers, row.styleID, row.partNumber, tier);
+        return pricing ? { ...row, ...pricing } : row;
+      })
+    );
+
+    const sorted = sortResults(withPricing).map(({ score, partNumber, styleID, ...rest }) => rest);
+    return json(200, { ok: true, count: sorted.length, results: sorted });
   }
 
-  // Try part numbers (with and without spaces)
-  variants.forEach((val) => {
-    urls.add(`${cleanBase}/V2/styles?partnumber=${encodeURIComponent(val)}&limit=20&mediatype=json`);
-  });
+  // For SKU-style queries, rely on the local index for substring matching, then fetch pricing
+  if (isSkuQuery) {
+    const indexHits = await searchLocalIndex(q, cleanBase, headers);
+    return json(200, { ok: true, count: indexHits.length, results: indexHits });
+  }
 
-  // Try style code/name if supported by API
-  variants.forEach((val) => {
-    urls.add(`${cleanBase}/V2/styles?style=${encodeURIComponent(val)}&limit=20&mediatype=json`);
-  });
+  if (isSkuQuery) {
+    // SKU mode: only hit styleid/partnumber endpoints to avoid broad fuzzy matches
+    if (numericQ) {
+      urls.add(`${cleanBase}/V2/styles?styleid=${encodeURIComponent(q)}&limit=20&mediatype=json`);
+    }
+    variants.forEach((val) => {
+      urls.add(`${cleanBase}/V2/styles?partnumber=${encodeURIComponent(val)}&limit=20&mediatype=json`);
+    });
+  } else {
+    // Non-SKU: broader searches
+    if (numericQ) {
+      urls.add(`${cleanBase}/V2/styles?styleid=${encodeURIComponent(q)}&limit=20&mediatype=json`);
+    }
+    if (brandFilter) {
+      urls.add(`${cleanBase}/V2/styles?brand=${encodeURIComponent(brandFilter)}&limit=200&mediatype=json`);
+      urls.add(`${cleanBase}/V2/styles?brandname=${encodeURIComponent(brandFilter)}&limit=200&mediatype=json`);
+    }
+    variants.forEach((val) => {
+      urls.add(`${cleanBase}/V2/styles?partnumber=${encodeURIComponent(val)}&limit=20&mediatype=json`);
+    });
+    variants.forEach((val) => {
+      urls.add(`${cleanBase}/V2/styles?style=${encodeURIComponent(val)}&limit=20&mediatype=json`);
+    });
+  }
 
   // As a last resort, allow a known-good style to prove connectivity (but do not merge it into results)
   const fallbackUrl = `${cleanBase}/V2/styles?styleid=${encodeURIComponent(styleIdOverride)}&limit=1&mediatype=json`;
@@ -69,6 +126,15 @@ exports.handler = async (event) => {
       return json(502, { ok: false, error: "Upstream S&S API unreachable" });
     }
 
+    const rawQueryLower = q.toLowerCase();
+    const pool = isSkuQuery
+      ? resultsCombined.filter((item) => {
+          const pn = String(item.partNumber || "").toLowerCase();
+          const sid = String(item.styleID || "").toLowerCase();
+          return (pn && pn.includes(rawQueryLower)) || (sid && sid.includes(rawQueryLower));
+        })
+      : resultsCombined;
+
     const deduped = [];
     const seen = new Set();
 
@@ -79,33 +145,55 @@ exports.handler = async (event) => {
       if (pnNorm && normVariants.includes(pnNorm)) score = Math.max(score, 90);
       const nameNorm = normalize(item.styleName || item.uniqueStyleName || item.title);
       if (nameNorm && normVariants.includes(nameNorm)) score = Math.max(score, 80);
+      if (pnNorm && normQ && pnNorm.startsWith(normQ)) score = Math.max(score, 70);
 
       if (queryTokens.length) {
         const haystack = normalize(
-          `${item.styleName || ""} ${item.uniqueStyleName || ""} ${item.title || ""} ${item.brandName || ""} ${item.baseCategory || ""} ${item.description || ""}`
+          `${item.styleName || ""} ${item.uniqueStyleName || ""} ${item.title || ""} ${item.brandName || ""} ${item.baseCategory || ""} ${item.description || ""} ${item.categories || ""}`
         );
-        // if all tokens appear somewhere in the text, treat as a relevant fuzzy hit
-        const allTokensMatch = queryTokens.every((tok) => haystack.includes(tok));
-        if (allTokensMatch) score = Math.max(score, 75);
+        const matches = queryTokens.filter((tok) => haystack.includes(tok)).length;
+        if (matches > 0) {
+          score = Math.max(score, 60 + matches * 5); // reward partial matches
+        }
+      }
+
+      if (brandFilter && normalize(item.brandName) === normalize(brandFilter)) {
+        score = Math.max(score, 70);
       }
       return score;
     };
 
-    for (const item of resultsCombined) {
+    const matchesType = (item) => {
+      if (!typeFilter) return true;
+      const text = normalize(`${item.baseCategory || ""} ${item.title || ""} ${item.styleName || ""} ${item.description || ""}`);
+      const tf = normalize(typeFilter);
+      const typeMap = {
+        SHORTSLEEVETEE: [/T[-\s]?SHIRT/, /SHORTSLEEVE/],
+        LONGSLEEVETEE: [/LONGSLEEVE/],
+        PULLOVERHOODIE: [/HOOD/, /PULLOVER/],
+        ZIPHOODIE: [/HOOD/, /ZIP/],
+        CREWNECKFLEECE: [/CREW/],
+        TOTEBAG: [/TOTE/],
+      };
+      const patterns = typeMap[tf] || [];
+      if (!patterns.length) return true;
+      return patterns.some((rx) => rx.test(text));
+    };
+
+    for (const item of pool) {
       const key = `${item.styleID || ""}-${item.partNumber || ""}-${item.styleName || ""}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      const score = scoreItem(item);
-      if (score <= 0) continue;
-      if (!isAllowedCategory(item)) continue;
-
       const styleIdStr = item.styleID ? String(item.styleID) : "";
       const pnNorm = normalize(item.partNumber);
       const nameNorm = normalize(item.styleName || item.uniqueStyleName || item.title);
       const matchesSku = (numericQ && styleIdStr === numericQ) || pnNorm === normQ || nameNorm === normQ;
+      const partialSku = pnNorm && normQ && pnNorm.includes(normQ);
 
-      // If the query looks like a SKU/code, require a direct match
-      if (isSkuQuery && !matchesSku) continue;
+      const score = scoreItem(item);
+      if (score <= 0) continue;
+      if (!isAllowedCategory(item)) continue;
+      if (!matchesType(item)) continue;
 
       let imageUrl = null;
       if (item.styleImage) {
@@ -126,25 +214,72 @@ exports.handler = async (event) => {
       });
     }
 
+    if (deduped.length === 0 && isSkuQuery) {
+      // Fallback straight to local index when API returned nothing for SKU queries
+      const fallback = await searchLocalIndex(q, cleanBase, headers);
+      return json(200, { ok: true, count: fallback.length, results: fallback });
+    }
     if (deduped.length === 0) {
       return json(200, { ok: true, count: 0, results: [] });
     }
 
-    const sorted = deduped.sort((a, b) => b.score - a.score || String(a.partNumber || "").localeCompare(String(b.partNumber || "")));
-    const limited = sorted.slice(0, 20); // cap to 20 to keep pricing lookups light
+    const filteredForSku = isSkuQuery
+      ? deduped.filter((item) => {
+          const idStr = item.styleID ? String(item.styleID) : "";
+          const pn = normalize(item.partNumber);
+          return (idStr && idStr.includes(normQ)) || (pn && pn.includes(normQ));
+        })
+      : deduped;
+
+    if (isSkuQuery && filteredForSku.length === 0) {
+      // Fallback: try local style index for partial matches
+      const index = loadLocalIndex();
+      if (index && index.length) {
+        const rawQ = q.toLowerCase();
+        const matches = index.filter((row) => {
+          const pn = String(row.partNumber || "").toLowerCase();
+          const sid = String(row.styleID || "").toLowerCase();
+          return (pn && pn.includes(rawQ)) || (sid && sid.includes(rawQ));
+        });
+        if (!matches.length) {
+          return json(200, { ok: true, count: 0, results: [] });
+        }
+
+        // Fetch pricing for the matched styles
+        const withPricingIndex = await Promise.all(
+          matches.slice(0, 20).map(async (row) => {
+            const tier = categoryTier(row);
+            const pricing = await fetchPricing(cleanBase, headers, row.styleID, row.partNumber, tier);
+            return pricing ? { ...row, ...pricing } : row;
+          })
+        );
+
+        const sortedIdx = sortResults(withPricingIndex);
+        return json(200, { ok: true, count: sortedIdx.length, results: sortedIdx });
+      }
+
+      return json(200, { ok: true, count: 0, results: [] });
+    }
 
     // Fetch pricing for top items (best-effort)
     const withPricing = await Promise.all(
-      limited.map(async (item) => {
+      filteredForSku.slice(0, 40).map(async (item) => {
         const tier = categoryTier(item);
         const pricing = await fetchPricing(cleanBase, headers, item.styleID, item.partNumber, tier);
         return pricing ? { ...item, ...pricing } : item;
       })
     );
 
-    const trimmed = withPricing
-      .map(({ score, partNumber, styleID, ...rest }) => rest)
-      .slice(0, 20);
+    let trimmed = sortResults(withPricing).slice(0, 20).map(({ score, partNumber, styleID, ...rest }) => rest);
+
+    if (isSkuQuery) {
+      trimmed = trimmed.filter((item) => {
+        const pn = String(item.partNumber || "").toLowerCase();
+        const sid = String(item.styleID || "").toLowerCase();
+        return pn.includes(rawQueryLower) || sid.includes(rawQueryLower);
+      });
+    }
+
     return json(200, { ok: true, count: trimmed.length, results: trimmed });
   } catch (err) {
     return json(502, { ok: false, error: String(err?.message || err) });
@@ -184,7 +319,132 @@ function normalize(str) {
   return String(str || "").replace(/\s+/g, "").toUpperCase();
 }
 
-function isAllowedCategory() {
+// Optional local style index to support partial SKU lookups.
+// Expected shape: [{ styleID, partNumber, brandName, styleName, baseCategory }]
+let _localIndexCache = null;
+function loadLocalIndex() {
+  if (_localIndexCache !== null) return _localIndexCache;
+  try {
+    const fs = require("fs");
+    const path = require("path");
+    const idxPath = path.join(process.cwd(), "notes", "ss-style-index.json");
+    if (!fs.existsSync(idxPath)) {
+      _localIndexCache = [];
+      return _localIndexCache;
+    }
+    const raw = fs.readFileSync(idxPath, "utf8");
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      _localIndexCache = data;
+    } else {
+      _localIndexCache = [];
+    }
+  } catch {
+    _localIndexCache = [];
+  }
+  return _localIndexCache;
+}
+exports.loadLocalIndex = loadLocalIndex;
+
+async function searchLocalIndex(q, base, headers) {
+  const index = loadLocalIndex();
+  if (!index || !index.length) return [];
+  const rawQ = String(q || '').toLowerCase();
+  const matches = index.filter((row) => {
+    const sn = String(row.styleName || '').toLowerCase();
+    return sn && sn.includes(rawQ);
+  });
+  if (!matches.length) return [];
+
+  // Dedup by styleID + partNumber
+  const seen = new Set();
+  const unique = [];
+  for (const row of matches) {
+    const key = `${row.styleID || ''}-${row.partNumber || ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(row);
+  }
+
+  const withPricing = await Promise.all(
+    unique.slice(0, 20).map(async (row) => {
+      const tier = categoryTier(row);
+      const pricing = await fetchPricing(base, headers, row.styleID, row.partNumber, tier);
+      return pricing ? { ...row, ...pricing } : row;
+    })
+  );
+  return sortResults(withPricing);
+}
+
+function sortResults(arr) {
+  return Array.from(arr || [])
+    .filter(Boolean)
+    .sort((a, b) => {
+      const qtyA = a.totalQty || 0;
+      const qtyB = b.totalQty || 0;
+      if (qtyB !== qtyA) return qtyB - qtyA;
+      const scoreA = a.score || 0;
+      const scoreB = b.score || 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return String(a.styleName || '').localeCompare(String(b.styleName || ''));
+    });
+}
+
+const ALLOW_CATEGORY_IDS = new Set([
+  21, // T-Shirts
+  57, // Short Sleeves
+  59, // Sweatshirts
+  395, // Sweatshirts & Fleece
+  9, // Fleece
+  36, // Hooded
+  8, // Crewneck
+  142, // Pullovers
+  22, // Totes / Bags
+  186, // Tote Bags
+]);
+
+const BAN_CATEGORY_IDS = new Set([
+  11, // Headwear
+  392, // Hats
+  241, // Visors
+  242, // Bucket Hats
+  147, // Trucker Caps
+  245, // Unstructured Hats
+  239, // Six-Panel Hats
+  238, // Five-Panel Hats
+  40, // Safety
+]);
+
+const ALLOW_KEYWORDS = [
+  /T[-\s]?SHIRT/i,
+  /\bTEE\b/i,
+  /FLEECE/i,
+  /HOOD/i,
+  /SWEAT/i,
+  /CREW/i,
+  /PULLOVER/i,
+  /TOTE/i,
+];
+
+const BAN_KEYWORDS = [/HAT/i, /HEADWEAR/i, /CAP/i, /VISOR/i, /SAFETY/i];
+
+function parseCategoryIds(item) {
+  return String(item.categories || "")
+    .split(",")
+    .map((x) => Number.parseInt(x.trim(), 10))
+    .filter((n) => Number.isFinite(n));
+}
+
+function isAllowedCategory(item) {
+  const ids = parseCategoryIds(item);
+  if (ids.some((id) => BAN_CATEGORY_IDS.has(id))) return false;
+  if (ids.some((id) => ALLOW_CATEGORY_IDS.has(id))) return true;
+
+  const text = `${item.baseCategory || ""} ${item.title || ""} ${item.styleName || ""} ${item.brandName || ""}`;
+  if (BAN_KEYWORDS.some((rx) => rx.test(text))) return false;
+  if (ALLOW_KEYWORDS.some((rx) => rx.test(text))) return true;
+
+  // default allow to avoid hiding valid items if tagging is incomplete
   return true;
 }
 
@@ -203,6 +463,7 @@ async function fetchPricing(base, headers, styleID, partNumber, tier, requireSal
     const byLabel = new Map();
     const colors = new Set();
     const colorImages = new Map(); // name -> image url
+    let totalQty = 0;
 
     const labelFor = (p) => p.sizePriceCodeName || p.sizePriceCode || p.sizeName || "Default";
     const isWhite = (p) => {
@@ -233,6 +494,14 @@ async function fetchPricing(base, headers, styleID, partNumber, tier, requireSal
         const img = pickImage(p);
         if (img && !colorImages.has(p.colorName)) {
           colorImages.set(p.colorName, img);
+        }
+      }
+      if (Array.isArray(p.warehouses)) {
+        for (const w of p.warehouses) {
+          const q = Number(w?.qty);
+          if (Number.isFinite(q) && q > 0) {
+            totalQty += q;
+          }
         }
       }
       const caseCost = rawVal(p, "casePrice") ?? rawVal(p, "caseprice") ?? rawVal(p, "case_price") ?? rawVal(p, "caseQtyPrice") ?? rawVal(p, "caseqtyprice");
@@ -297,6 +566,7 @@ async function fetchPricing(base, headers, styleID, partNumber, tier, requireSal
       sizePrices,
       colors: Array.from(colors).sort(),
       colorImages: Array.from(colorImages.entries()).map(([name, image]) => ({ name, image })),
+      totalQty,
     };
   } catch {
     return null;

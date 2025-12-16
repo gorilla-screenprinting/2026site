@@ -766,7 +766,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!section) return;
 
     const form = section.querySelector('.catalog-search-form');
-    const input = section.querySelector('#catalog-search-input');
+    const styleInput = section.querySelector('#catalog-style-input');
+    const brandSelect = section.querySelector('#catalog-brand-select');
+    const typeSelect = section.querySelector('#catalog-type-select');
+    const browseBtn = section.querySelector('#catalog-browse-trigger');
     const statusEl = section.querySelector('.catalog-status');
     const resultsEl = section.querySelector('.catalog-results');
 
@@ -868,9 +871,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
-    const runSearch = async (q) => {
+    const runSearch = async ({ q, brand, type }) => {
       const params = new URLSearchParams();
-      params.set('q', q);
+      if (q) params.set('q', q);
+      if (brand) params.set('brand', brand);
+      if (type) params.set('type', type);
       renderStatus('Searching catalog…');
       renderResults([]);
       try {
@@ -892,18 +897,52 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    if (form && input) {
+    const buildBrowseQuery = () => {
+      const brand = (brandSelect?.value || '').trim();
+      const type = (typeSelect?.value || '').trim();
+      return [brand, type].filter(Boolean).join(' ');
+    };
+
+    if (form && styleInput) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const q = (input.value || '').trim();
+        const q = (styleInput.value || '').trim();
         if (!q) {
-          renderStatus('Enter a style or brand + style to search.');
+          renderStatus('Enter a style number, or use the brand + style selectors.');
           renderResults([]);
           return;
         }
-        runSearch(q);
+        runSearch({ q, brand: brandSelect?.value || '', type: typeSelect?.value || '' });
       });
     }
+
+    const runBrowse = () => {
+      const q = buildBrowseQuery();
+      if (!q) {
+        renderStatus('Pick a brand or a style to browse.');
+        renderResults([]);
+        return;
+      }
+      runSearch({ q, brand: brandSelect?.value || '', type: typeSelect?.value || '' });
+    };
+
+    if (browseBtn) {
+      browseBtn.addEventListener('click', () => runBrowse());
+    }
+
+    [brandSelect, typeSelect].forEach((el) => {
+      if (!el) return;
+      el.addEventListener('change', () => {
+        if (el === brandSelect) {
+          renderCategoryOptions();
+        } else {
+          renderBrandOptions();
+        }
+        // Auto-run when the user picks something
+        const q = buildBrowseQuery();
+        if (q) runSearch({ q, brand: brandSelect?.value || '', type: typeSelect?.value || '' });
+      });
+    });
 
     function stripHtml(str) {
       return String(str || '').replace(/<[^>]*>/g, ' ');
@@ -914,6 +953,56 @@ document.addEventListener('DOMContentLoaded', () => {
       div.innerHTML = str;
       return div.textContent || div.innerText || '';
     }
+
+    let metaCache = null;
+
+    // Populate brand/type selectors from catalog-meta with cross-filtering
+    async function loadCatalogMeta() {
+      try {
+        const res = await fetch('/.netlify/functions/catalog-meta');
+        const data = await res.json().catch(() => ({}));
+        if (!data.ok) return;
+        metaCache = data;
+        renderBrandOptions();
+        renderCategoryOptions();
+      } catch {
+        /* ignore */
+      }
+    }
+
+    function renderBrandOptions() {
+      if (!brandSelect || !metaCache) return;
+      const selectedCat = (typeSelect?.value || '').trim();
+      const currentBrand = (brandSelect.value || '').trim();
+      const allowedBrands =
+        selectedCat && metaCache.categoryToBrands && metaCache.categoryToBrands[selectedCat]
+          ? metaCache.categoryToBrands[selectedCat]
+          : metaCache.brands || [];
+      const optionsHtml =
+        '<option value="">Any brand</option>' + allowedBrands.map((b) => `<option value="${b}">${b}</option>`).join('');
+      brandSelect.innerHTML = optionsHtml;
+      if (currentBrand && allowedBrands.includes(currentBrand)) {
+        brandSelect.value = currentBrand;
+      }
+    }
+
+    function renderCategoryOptions() {
+      if (!typeSelect || !metaCache) return;
+      const selectedBrand = (brandSelect?.value || '').trim();
+      const currentCat = (typeSelect.value || '').trim();
+      const allowedCats =
+        selectedBrand && metaCache.brandToCategories && metaCache.brandToCategories[selectedBrand]
+          ? metaCache.brandToCategories[selectedBrand]
+          : metaCache.categories || [];
+      const optionsHtml =
+        '<option value="">Any style</option>' + allowedCats.map((c) => `<option value="${c}">${c}</option>`).join('');
+      typeSelect.innerHTML = optionsHtml;
+      if (currentCat && allowedCats.includes(currentCat)) {
+        typeSelect.value = currentCat;
+      }
+    }
+
+    loadCatalogMeta();
 
   }
 });

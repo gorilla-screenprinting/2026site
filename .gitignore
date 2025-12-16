@@ -1,35 +1,15 @@
-# macOS system files
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Icon files on some external volumes
-Icon?
-
-# Thumbnails
-._*
-
-# Spotlight and Trash
-.Spotlight-V100
-.Trashes
-
-# Time Machine
-.TemporaryItems
-
-# APFS / volume-related
-.fseventsd
-.VolumeIcon.icns
-
-# macOS cache files
-*.swp
-*.swo
-
-
-# dirs i don't need to share
-*/templates
-# Local Netlify folder
-.netlify
-
-.env
+# Node/Netlify artifacts
 node_modules/
 .netlify/
+.env
+.env.*
+
+# Temp directories
+tmp-home/
+.npm/
+
+# OS noise
+.DS_Store
+
+# Deno/Edge lockfile (not used)
+deno.lock
