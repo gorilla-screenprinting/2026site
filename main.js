@@ -89,6 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initLogoVariants();
   initCatalogSearch();
+  initReviews();
+  initQuoteForm();
   initGallery();
   initLogoMarquee();
   initIframeResizer();
@@ -139,9 +141,15 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
         id: 'gallery3',
-        title: 'Gallery 3',
+        title: 'Custom Totes',
         folder: './assets/gallery/gallery3/',
-        files: [],
+        files: [
+          'pcc1.jpeg',
+          'pcc2.jpeg',
+          'hm1.jpeg',
+          'pcc3.png',
+          'pcc4.jpeg'
+        ],
       },
     ];
     const galleryConfig = galleries.reduce((acc, g) => {
@@ -762,7 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initCatalogSearch() {
-    const section = document.querySelector('.section-catalog');
+    const section = document.querySelector('.catalog-card');
     if (!section) return;
 
     const form = section.querySelector('.catalog-search-form');
@@ -1004,5 +1012,352 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadCatalogMeta();
 
+  }
+
+  function initReviews() {
+    const section = document.querySelector('#reviews-section');
+    if (!section) return;
+    const grid = section.querySelector('.reviews-grid');
+    const statusEl = section.querySelector('.reviews-status');
+
+    let reviews = [];
+    let idx = 0;
+
+    const setStatus = (t) => {
+      if (statusEl) statusEl.textContent = t || '';
+    };
+
+    const render = (direction) => {
+      if (!grid) return;
+      grid.innerHTML = '';
+      if (!reviews || !reviews.length) {
+        setStatus('No recent 5-star reviews found.');
+        return;
+      }
+      const r = reviews[idx];
+      const carousel = document.createElement('div');
+      carousel.className = 'reviews-carousel';
+
+      const prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'review-nav prev';
+      prev.textContent = '‹';
+
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'review-nav next';
+      next.textContent = '›';
+
+      const card = document.createElement('article');
+      card.className = 'review-card';
+      const header = document.createElement('div');
+      header.className = 'review-header';
+      const name = document.createElement('div');
+      name.className = 'review-name';
+      name.textContent = r.author || 'Google reviewer';
+      const stars = document.createElement('div');
+      stars.className = 'review-stars';
+      stars.textContent = '★★★★★';
+      const time = document.createElement('div');
+      time.className = 'review-time';
+      time.textContent = r.time || '';
+      header.append(name, stars, time);
+
+      const body = document.createElement('p');
+      body.className = 'review-text';
+      body.textContent = r.text || '';
+
+      card.append(header, body);
+      carousel.append(prev, card, next);
+      grid.appendChild(carousel);
+
+      prev.addEventListener('click', () => {
+        idx = (idx - 1 + reviews.length) % reviews.length;
+        animateSwap('left', () => render('left'));
+      });
+      next.addEventListener('click', () => {
+        idx = (idx + 1) % reviews.length;
+        animateSwap('right', () => render('right'));
+      });
+    };
+
+    const animateSwap = (direction, cb) => {
+      if (!grid) return cb();
+      const outClass = direction === 'right' ? 'slide-out-left' : 'slide-out-right';
+      const inClass = direction === 'right' ? 'slide-in-right' : 'slide-in-left';
+      grid.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+      grid.classList.add(outClass);
+      setTimeout(() => {
+        cb();
+        requestAnimationFrame(() => {
+          grid.classList.remove('slide-out-left', 'slide-out-right');
+          grid.classList.add(inClass);
+          setTimeout(() => {
+            grid.classList.remove('slide-in-left', 'slide-in-right');
+          }, 300);
+        });
+      }, 250);
+    };
+
+    const load = async () => {
+      setStatus('Loading reviews…');
+      try {
+        const res = await fetch('/.netlify/functions/google-reviews');
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          setStatus('Unable to load reviews right now.');
+          return;
+        }
+        if (data.rating && data.total) {
+          setStatus(`Google rating: ${data.rating.toFixed ? data.rating.toFixed(1) : data.rating} (${data.total} reviews)`);
+        } else {
+          setStatus('');
+        }
+        reviews = data.reviews || [];
+        idx = 0;
+        render();
+      } catch (err) {
+        setStatus('Unable to load reviews right now.');
+      }
+    };
+
+    load();
+  }
+
+  function initQuoteForm() {
+    const form = document.getElementById('quote-form');
+    if (!form) return;
+
+    const formStartInput = document.getElementById('formStart');
+    const orderLines = document.getElementById('orderLines');
+    const addProductBtn = document.getElementById('addProduct');
+    const bananaToggle = document.getElementById('banana-toggle');
+    const dvdEmoji = document.getElementById('dvd-emoji');
+
+    // timestamp for bot detection
+    if (formStartInput) {
+      formStartInput.value = Date.now();
+    }
+
+    // Bouncing banana toggle
+    if (bananaToggle && dvdEmoji) {
+      const bounds = () => {
+        const w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
+        const h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
+        return { w, h };
+      };
+      let { w: bw, h: bh } = bounds();
+      let x = Math.random() * Math.max(1, bw - dvdEmoji.offsetWidth);
+      let y = Math.random() * Math.max(1, bh - dvdEmoji.offsetHeight);
+      let vx = 0.08;
+      let vy = 0.06;
+      let isRunning = false;
+
+      function dvdStep(ts) {
+        if (!dvdStep.last) dvdStep.last = ts;
+        const dt = ts - dvdStep.last;
+        dvdStep.last = ts;
+
+        const { w, h } = bounds();
+        const inset = -10;
+        const maxX = w - dvdEmoji.offsetWidth - inset;
+        const maxY = h - dvdEmoji.offsetHeight - inset;
+
+        x += vx * dt;
+        y += vy * dt;
+
+        if (x <= inset || x >= maxX) {
+          vx *= -1;
+          x = Math.max(inset, Math.min(x, maxX));
+        }
+        if (y <= inset || y >= maxY) {
+          vy *= -1;
+          y = Math.max(inset, Math.min(y, maxY));
+        }
+        dvdEmoji.style.transform = `translate(${x}px, ${y}px)`;
+
+        if (isRunning) requestAnimationFrame(dvdStep);
+      }
+
+      window.addEventListener('resize', () => {
+        const { w, h } = bounds();
+        x = Math.min(Math.max(0, x), Math.max(0, w - dvdEmoji.offsetWidth));
+        y = Math.min(Math.max(0, y), Math.max(0, h - dvdEmoji.offsetHeight));
+      });
+
+      dvdEmoji.style.opacity = '0';
+      bananaToggle.addEventListener('click', () => {
+        isRunning = !isRunning;
+        bananaToggle.setAttribute('aria-pressed', isRunning ? 'true' : 'false');
+        dvdEmoji.style.opacity = isRunning ? '0.8' : '0';
+        if (isRunning) {
+          dvdStep.last = undefined;
+          requestAnimationFrame(dvdStep);
+        }
+      });
+    }
+
+    let productIndex = 0;
+
+    function getOrdinal(n) {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    }
+
+    function addPrintPlacement(idx) {
+      const container = document.getElementById('printPlacements' + idx);
+      if (!container) return;
+
+      const count = container.querySelectorAll('.printPlacement').length;
+      const ordinal = getOrdinal(count + 1);
+
+      const div = document.createElement('div');
+      div.className = 'printPlacement';
+      div.innerHTML = `
+        <label>${ordinal} Location:
+          <select name="placementName${idx}_${count}" required>
+            <option value="">Select Print Location...</option>
+            <option value="Front">Front</option>
+            <option value="Left chest">Left chest</option>
+            <option value="Back">Back</option>
+            <option value="Short sleeve">Short sleeve</option>
+            <option value="Long sleeve">Long sleeve</option>
+            <option value="Custom">Custom</option>
+          </select>
+        </label>
+        <label># Colors:
+          <select name="colors${idx}_${count}" required>
+            <option value="">Select #...</option>
+            <option value="1">1 color</option>
+            <option value="2">2 colors</option>
+            <option value="3">3 colors</option>
+            <option value="4">4 colors</option>
+            <option value="5">5 colors</option>
+            <option value="6">6 colors</option>
+            <option value="7">7 colors</option>
+            <option value="8">8 colors</option>
+          </select>
+        </label>
+      `;
+      container.appendChild(div);
+    }
+
+    function addGarment(idx) {
+      const container = document.getElementById('garments' + idx);
+      if (!container) return;
+      const count = container.querySelectorAll('.garmentType').length;
+      const ordinal = getOrdinal(count + 1);
+      const div = document.createElement('div');
+      div.className = 'garmentType';
+      div.innerHTML = `
+        <label>${ordinal} blank:
+          <input
+            type="text"
+            name="garmentType${idx}_${count}"
+            required
+            placeholder="e.g. cotton unisex tee, jumbo tote, etc"
+          >
+        </label>
+        <label>Qty:
+          <input type="number" name="garmentQty${idx}_${count}" min="1" required>
+        </label>
+      `;
+      container.appendChild(div);
+    }
+
+    function addProduct() {
+      if (!orderLines) return;
+      const idx = productIndex;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'orderLine';
+      wrapper.id = `product${idx}`;
+      wrapper.dataset.productIndex = String(idx);
+
+      const placements = document.createElement('div');
+      placements.className = 'printPlacements';
+      placements.id = `printPlacements${idx}`;
+
+      const addPlacementBtn = document.createElement('button');
+      addPlacementBtn.type = 'button';
+      addPlacementBtn.className = 'actionButton add-placement';
+      addPlacementBtn.textContent = 'Add Print';
+      addPlacementBtn.dataset.productIndex = String(idx);
+      placements.appendChild(addPlacementBtn);
+
+      const garments = document.createElement('div');
+      garments.className = 'garments';
+      garments.id = `garments${idx}`;
+
+      const addGarmentBtn = document.createElement('button');
+      addGarmentBtn.type = 'button';
+      addGarmentBtn.className = 'actionButton add-garment';
+      addGarmentBtn.textContent = 'Add Blank';
+      addGarmentBtn.dataset.productIndex = String(idx);
+      garments.appendChild(addGarmentBtn);
+
+      const label = document.createElement('div');
+      label.className = 'product-label';
+      label.textContent = `Product #${idx + 1}`;
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(garments);
+      wrapper.appendChild(placements);
+      orderLines.appendChild(wrapper);
+
+      productIndex++;
+    }
+
+    if (addProductBtn) {
+      addProductBtn.addEventListener('click', addProduct);
+    }
+
+    if (orderLines) {
+      orderLines.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const placementBtn = target.closest('.add-placement');
+        const garmentBtn = target.closest('.add-garment');
+        if (placementBtn) {
+          const idx = parseInt(placementBtn.dataset.productIndex || '0', 10);
+          addPrintPlacement(idx);
+        } else if (garmentBtn) {
+          const idx = parseInt(garmentBtn.dataset.productIndex || '0', 10);
+          addGarment(idx);
+        }
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        const productBlocks = document.getElementsByClassName('orderLine');
+        const totalProducts = productBlocks.length;
+        if (totalProducts === 0) {
+          alert('Please add at least one product.');
+          e.preventDefault();
+          return;
+        }
+        let invalidQuantity = false;
+        for (let i = 0; i < totalProducts; i++) {
+          let totalQuantity = 0;
+          const quantities = form.querySelectorAll(`input[name^="garmentQty${i}_"]`);
+          quantities.forEach((qty) => {
+            const val = parseInt(qty.value, 10);
+            if (!isNaN(val)) totalQuantity += val;
+          });
+          if (totalQuantity < 36) {
+            alert(`Total quantity for product ${i + 1} is less than 36. Please increase the quantity.`);
+            invalidQuantity = true;
+          }
+        }
+        if (invalidQuantity) {
+          e.preventDefault();
+          return;
+        }
+        setTimeout(() => {
+          window.location.href = 'https://www.gorillaprintshop.com/thankyou';
+        }, 500);
+      });
+    }
   }
 });
