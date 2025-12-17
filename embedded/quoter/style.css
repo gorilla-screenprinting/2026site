@@ -2,11 +2,7 @@
    Tokens / Theme
 ======================== */
 :root {
-  --bg: #f5f0c3;      /* matches site bkgd2 (lighter) */
-  --panel: #004153;   /* matches site type1 (dark blue) */
-  --text: #ffda00;    /* matches site acct1 (yellow) */
-  --muted: #008776;   /* matches site acct2 (turquoise) */
-  --accent: #ff2a5f;  /* matches site type2 (pink) */
+  /* Colors come from ../../styles.css root tokens */
   --radius: 12px;
   --radius-sm: 8px;
   --gap: 16px;
@@ -42,8 +38,8 @@ body {
 }
 
 body {
-  background: var(--bg);
-  color: var(--panel);
+  background: var(--bkgd2);
+  color: var(--type1);
   font-family: "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -54,7 +50,7 @@ body {
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--text);
+  color: var(--acct1);
   margin-bottom: 0.5rem;
   font-family: "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 700;
@@ -62,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Accessible focus */
 :focus-visible {
-  outline: 3px solid var(--text);
+  outline: 3px solid var(--acct1);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -77,8 +73,8 @@ select {
   padding: 10px 12px;
   border: none;
   border-radius: var(--radius);
-  background: #f7e16d; /* site bkgd1 */
-  color: var(--muted);
+  background: var(--bkgd1);
+  color: var(--acct2);
   font-family: inherit;
   line-height: 1.2;
   margin-top: 4px;
@@ -89,70 +85,13 @@ label {
   font-size: 1rem;
   display: block;
   margin-bottom: 0.75rem;
-  color: var(--muted);
+  color: var(--acct2);
   font-weight: 700;
 }
 
-/* ========================
-   Buttons
-======================== */
-button {
-  display: inline-block;
-  padding: 0.9rem 1.1rem;
-  border: none;
-  border-radius: var(--radius);
-  font-family: "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 1rem;
-  cursor: pointer;
-  background: var(--muted); /* turquoise */
-  color: var(--bg);         /* light background */
-  transition: transform 120ms ease, box-shadow 120ms ease;
+/* Buttons are styled via shared .btn rules in ../../styles.css */
+.actionButton {
   margin-top: 0.6rem;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-}
-
-button.primary {
-  background: var(--muted);
-  color: var(--bg);
-}
-
-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.14);
-}
-button:active:not(:disabled) {
-  transform: scale(.96);
-  background: var(--muted);
-  color: var(--bg);
-}
-
-/* Ensure all utility buttons (add blank/print/product) keep the light text */
-.actionButton,
-.actionButton:hover,
-.actionButton:active,
-.actionButton:focus-visible,
-#addProduct,
-#addProduct:hover,
-#addProduct:active,
-#addProduct:focus-visible {
-  background: var(--muted);
-  color: var(--bg) !important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-}
-
-/* Ensure row buttons (Add New Product, Submit) keep light text */
-.button-row button {
-  color: var(--bg) !important;
-}
-.button-row button:hover,
-.button-row button:active,
-.button-row button:focus-visible {
-  color: var(--bg) !important;
 }
 
 /* ========================
@@ -182,25 +121,25 @@ button:active:not(:disabled) {
   display: inline-block;
   white-space: nowrap;
   line-height: 1;
-  color: var(--panel);
+  color: var(--type1);
 }
 
 /* Card title uses JS fitter too */
 .fit-heading {
   display: block;
   white-space: normal;
-  font-size: clamp(36px, 5vw, 52px);
+  font-size: clamp(24px, 5vw, 36px);
   line-height: 1.05;
   text-align: left;
-  font-family: "Bagel Fat One", "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--muted);
+  font-family:  "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--acct2);
   margin: 0;
 }
 
 /* Card container */
 .card {
-  background: var(--bg);
-  color: var(--panel);
+  background: var(--bkgd2);
+  color: var(--type1);
   padding: 1.5rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -220,7 +159,7 @@ button:active:not(:disabled) {
   height: 52px;
   border-radius: 12px;
   background: transparent;
-  color: var(--panel);
+  color: var(--type1);
   font-size: 24px;
   line-height: 1;
   display: inline-flex;
@@ -255,15 +194,12 @@ button:active:not(:disabled) {
   flex: 1 1 auto;
   min-width: 140px;
   width: auto;
-  background: var(--muted);
-  color: var(--bg) !important;
-  font-weight: 700;
 }
 /* Product label above each outlined box */
 .product-label {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  color: var(--accent);
+  color: var(--type2);
   font-family: "Bagel Fat One", "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -272,7 +208,7 @@ button:active:not(:disabled) {
   margin-top: 1.3rem;
   padding: 1rem;
   border-radius: var(--radius);
-  border: 2px solid var(--accent);
+  border: 2px solid var(--type2);
 }
 
 /* Garment row: wide text, narrow quantity */

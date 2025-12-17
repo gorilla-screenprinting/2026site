@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const addPlacementBtn = document.createElement('button');
     addPlacementBtn.type = 'button';
-    addPlacementBtn.className = 'actionButton add-placement';
+    addPlacementBtn.className = 'btn actionButton add-placement';
     addPlacementBtn.textContent = 'Add Print';
     addPlacementBtn.dataset.productIndex = String(idx);
     placements.appendChild(addPlacementBtn);
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const addGarmentBtn = document.createElement('button');
     addGarmentBtn.type = 'button';
-    addGarmentBtn.className = 'actionButton add-garment';
+    addGarmentBtn.className = 'btn actionButton add-garment';
     addGarmentBtn.textContent = 'Add Blank';
     addGarmentBtn.dataset.productIndex = String(idx);
     garments.appendChild(addGarmentBtn);

@@ -6,11 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gorilla Quoter</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap" rel="stylesheet">
-
-
+  <!-- Load shared site tokens/fonts first, then embed-specific styles -->
+  <link rel="stylesheet" href="../../styles.css">
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
@@ -54,15 +51,17 @@
           <div id="orderLines"></div>
 
           <div class="button-row">
-            <button type="button" id="addProduct">Add New Product</button>
-            <button class="primary" type="submit">Submit Quote Request</button>
+            <button class="btn" type="button" id="addProduct">Add New Product</button>
+            <button class="btn" type="submit">Submit Quote Request</button>
           </div>
 
         </form>
       </div>
     </div>
   </div>
+  
   <div id="dvd-emoji" aria-hidden="true">🍌</div>
+
   <script>
     const postHeight = () => {
       const container = document.querySelector('.container');

@@ -1085,16 +1085,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!grid) return cb();
       const outClass = direction === 'right' ? 'slide-out-left' : 'slide-out-right';
       const inClass = direction === 'right' ? 'slide-in-right' : 'slide-in-left';
-      grid.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
-      grid.classList.add(outClass);
+      const clearClasses = ['slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right'];
+
+      const oldCard = grid.querySelector('.review-card');
+      if (oldCard) {
+        oldCard.classList.remove(...clearClasses);
+        oldCard.classList.add(outClass);
+      }
+
       setTimeout(() => {
         cb();
         requestAnimationFrame(() => {
-          grid.classList.remove('slide-out-left', 'slide-out-right');
-          grid.classList.add(inClass);
-          setTimeout(() => {
-            grid.classList.remove('slide-in-left', 'slide-in-right');
-          }, 300);
+          const newCard = grid.querySelector('.review-card');
+          if (newCard) {
+            newCard.classList.remove(...clearClasses);
+            newCard.classList.add(inClass);
+            setTimeout(() => newCard.classList.remove(inClass), 300);
+          }
         });
       }, 250);
     };
