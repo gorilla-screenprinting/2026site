@@ -48,14 +48,6 @@ body {
   overflow: hidden;
 }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--acct1);
-  margin-bottom: 0.5rem;
-  font-family: "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-weight: 700;
-}
-
 /* Accessible focus */
 :focus-visible {
   outline: 3px solid var(--acct1);

@@ -748,24 +748,33 @@ document.addEventListener('DOMContentLoaded', () => {
       '/assets/header-logo-4.svg',
     ];
 
-    const setVariant = (path) => {
-      logoEl.style.setProperty('--logo-mask', `url("${path}")`);
+    let currentIdx = 0; // always start on default
+    let resetTimer = null;
+
+    const setVariant = (idx) => {
+      currentIdx = idx;
+      logoEl.style.setProperty('--logo-mask', `url("${variants[currentIdx]}")`);
+
+      if (resetTimer) {
+        clearTimeout(resetTimer);
+        resetTimer = null;
+      }
+      // If we're on a non-default logo, schedule a snap back after 10s idle
+      if (currentIdx !== 0) {
+        resetTimer = setTimeout(() => {
+          currentIdx = 0;
+          logoEl.style.setProperty('--logo-mask', `url("${variants[0]}")`);
+          resetTimer = null;
+        }, 10_000);
+      }
     };
 
-    const pickRandom = (exclude) => {
-      const pool = variants.filter((v) => v !== exclude);
-      if (!pool.length) return exclude || variants[0];
-      const idx = Math.floor(Math.random() * pool.length);
-      return pool[idx];
-    };
-
-    let current = pickRandom();
-    setVariant(current);
+    // initialize to the default logo
+    setVariant(0);
 
     logoEl.addEventListener('click', () => {
-      const next = pickRandom(current);
-      current = next;
-      setVariant(next);
+      const nextIdx = (currentIdx + 1) % variants.length;
+      setVariant(nextIdx);
     });
   }
 
@@ -1073,11 +1082,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       prev.addEventListener('click', () => {
         idx = (idx - 1 + reviews.length) % reviews.length;
-        animateSwap('left', () => render('left'));
+        animateSwap('right', () => render('left'));
       });
       next.addEventListener('click', () => {
         idx = (idx + 1) % reviews.length;
-        animateSwap('right', () => render('right'));
+        animateSwap('left', () => render('right'));
       });
     };
 

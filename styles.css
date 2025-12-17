@@ -1,13 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Capriola&family=Bagel+Fat+One&display=swap');
 
+/* ===== Theme tokens ===== */
 :root {
   /* Global color tokens */
-  --bkgd1: #f7e16d;
-  --bkgd2: #f5f0c3;
-  --type1: #014148;
+  --bkgd1: #fbe05d;
+  --bkgd2: #f8f5e9;
+  --type1: var(--acct2);
   --type2: #ff2a5f;
-  --acct1: #ffda00;
-  --acct2: #008776;
+  --acct1: var(--bkgd1);
+  --acct2: #02686e;
   --lightbox-caption-h: 72px;
   /* Buttons */
   --btn-bg: var(--acct2);
@@ -34,6 +35,7 @@ body {
   color: var(--acct2);
 }
 
+/* ===== Buttons ===== */
 .btn {
   display: inline-block;
   padding: var(--btn-padding);
@@ -64,10 +66,22 @@ body {
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--acct1);
+  outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
+/* ===== Headings ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 700;
+  color: inherit;
+}
+
+.heading-accent {
+  color: var(--acct1);
+}
+
+/* ===== Page layout ===== */
 .site-root {
   min-height: 100vh;
   display: flex;
@@ -241,7 +255,7 @@ main {
   flex: 1;
 }
 
-/* Sections */
+/* ===== Sections ===== */
 .section {
   width: 100%;
   padding: 2rem 1.5rem;
@@ -249,6 +263,16 @@ main {
   color: var(--section-color, var(--type1));
   font-weight: var(--section-weight, 400);
   scroll-margin-top: 90px; /* offset for sticky header */
+}
+
+.section-contrast {
+  --section-bg: var(--bkgd1);
+  --section-color: var(--type1);
+}
+
+.section-accent {
+  --section-bg: var(--acct1);
+  --section-color: var(--type1);
 }
 
 .section + .section {
@@ -261,21 +285,13 @@ main {
   width: 100%;
 }
 
+/* ===== Galleries ===== */
 .gallery-collection {
   display: grid;
   gap: 2rem;
 }
 
-#extra-section.section {
-  --section-bg: var(--bkgd2);
-  --section-color: var(--type1);
-}
-
-.section-catalog {
-  --section-bg: var(--bkgd1);
-  --section-color: var(--type1);
-}
-
+/* ===== Catalog search card ===== */
 .catalog-card {
   background: var(--bkgd2);
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -287,22 +303,24 @@ main {
 
 .catalog-head h1 {
   margin: 0 0 0.35rem 0;
-  font-family:  "Capriola", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: clamp(28px, 5vw, 36px);
   line-height: 1.05;
-  font-weight: 400;
-  color: var(--acct2);
+  font-weight: 700;
 }
 
 .catalog-head h2 {
   margin: 0 0 0.3rem 0;
   font-size: clamp(1.4rem, 2vw, 1.75rem);
-  color: var(--acct2);
 }
 
 .catalog-head p {
   margin: 0 0 1rem 0;
   max-width: 46ch;
+}
+
+.catalog-head h1,
+.catalog-head h2,
+.catalog-head p {
   color: var(--acct2);
 }
 
@@ -348,18 +366,6 @@ main {
   gap: 0.6rem;
   align-items: end;
 }
-.catalog-dual-row .catalog-browse-btn {
-  width: 100%;
-}
-.catalog-dual-row .catalog-browse-btn button {
-  width: 100%;
-}
-
-@media (max-width: 900px) {
-  .catalog-row {
-    grid-template-columns: 1fr;
-  }
-}
 
 @media (max-width: 1190px) {
   .catalog-row {
@@ -368,9 +374,6 @@ main {
 }
 
 @media (max-width: 600px) {
-  .catalog-row {
-    grid-template-columns: 1fr;
-  }
   .catalog-input-row {
     grid-template-columns: 1fr;
   }
@@ -393,16 +396,7 @@ main {
   gap: 0.6rem;
 }
 
-.catalog-input-row input {
-  width: 100%;
-  padding: 0.9rem 0.9rem;
-  border-radius: 10px;
-  border: none;
-  font: inherit;
-  background: var(--bkgd1);
-  color: var(--acct2);
-}
-
+.catalog-input-row input,
 .catalog-select select {
   width: 100%;
   padding: 0.9rem 0.9rem;
@@ -416,10 +410,6 @@ main {
 .catalog-input-row input:focus-visible {
   outline: 2px solid transparent;
   outline-offset: 0;
-}
-
-.catalog-input-row button {
-  /* styled via .btn; layout handled by grid */
 }
 
 .catalog-browse-btn button {
@@ -436,7 +426,6 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
-  margin-top: 0;
 }
 
 .catalog-card-item {
@@ -471,8 +460,8 @@ main {
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: var(--acct1);
-  color: var(--type2);
+  background: var(--acct2);
+  color: var(--bkgd2);
   font-size: 20px;
   cursor: pointer;
 }
@@ -538,8 +527,8 @@ main {
 }
 
 .catalog-sizes .pill-size {
-  background: rgba(0, 0, 0, 0.08);
-  color: var(--type1);
+  background: var(--acct2);
+  color: var(--bkgd2);
   font-weight: 600;
 }
 
@@ -623,8 +612,6 @@ main {
   position: relative;
   overflow: hidden;
   width: 100%;
-  border-radius: 0;
-  background: transparent;
   margin-bottom: 0.2rem;
 }
 
@@ -633,7 +620,6 @@ main {
   justify-content: center;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 0;
 }
 
 .gallery-action {
@@ -698,7 +684,6 @@ main {
 .logo-carousel {
   position: relative;
   overflow: hidden;
-  margin-top: 1.25rem;
   border-radius: 16px;
   padding: 0.75rem 0;
 }
@@ -731,14 +716,9 @@ main {
 .gallery-title {
   padding: 0.75rem 0.5rem 1.25rem;
   font-weight: 600;
-  color: inherit;
 }
 
-/* Reviews */
-#reviews-section {
-  --section-bg: var(--bkgd2);
-  --section-color: var(--type1);
-}
+/* ===== Reviews ===== */
 .reviews-head h2 {
   margin: 0 0 0.25rem;
 }
@@ -751,9 +731,6 @@ main {
   color: var(--type1);
   margin-bottom: 0.5rem;
 }
-.reviews-grid {
-  display: block;
-}
 .review-card {
   background: var(--type1);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -765,23 +742,6 @@ main {
   flex-direction: column;
   gap: 0.4rem;
   min-height: 180px;
-}
-.reviews-carousel {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.6rem;
-  min-height: 230px;
-}
-.review-nav {
-  width: 38px;
-  height: 38px;
-  border: none;
-  border-radius: 50%;
-  background: var(--acct1);
-  color: var(--type2);
-  font-size: 20px;
-  cursor: pointer;
 }
 .reviews-carousel {
   display: grid;
@@ -836,6 +796,7 @@ main {
   flex: 1 1 auto;
 }
 
+/* ===== Lightbox ===== */
 .reviews-grid.slide-in-left,
 .review-card.slide-in-left { animation: slideInLeft 300ms ease; }
 .reviews-grid.slide-in-right,
@@ -862,6 +823,7 @@ main {
   to { opacity: 0; transform: translateX(40px); }
 }
 
+/* ===== Lightbox ===== */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -975,6 +937,7 @@ body.no-scroll {
   overflow: hidden;
 }
 
+/* ===== Footer ===== */
 .site-footer {
   background: var(--bkgd2);
   color: var(--type1);
@@ -991,7 +954,6 @@ body.no-scroll {
   gap: 1rem;
   flex-wrap: wrap;
   font-weight: 600;
-  color: inherit;
 }
 
 h2 { margin: 0.5rem 0 1rem; }
@@ -999,6 +961,7 @@ p  { margin: 0.5rem 0 1rem; }
 a  { color: var(--acct2); }
 a:hover, a:focus-visible { color: var(--acct2); }
 
+/* ===== Embedded iframe wrapper ===== */
 .embedded-wrap {
   width: 100%;
   overflow: hidden;
