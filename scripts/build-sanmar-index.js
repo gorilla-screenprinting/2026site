@@ -122,11 +122,11 @@ async function build() {
     let entry = styles.get(style);
     if (!entry) {
       const styleImg = pickImage([
+        row['FRONT_FLAT_IMAGE_URL'],
+        row['BACK_FLAT_IMAGE_URL'],
         row['PRODUCT_IMAGE'],
         row['FRONT_MODEL_IMAGE_URL'],
         row['BACK_MODEL_IMAGE_URL'],
-        row['FRONT_FLAT_IMAGE_URL'],
-        row['BACK_FLAT_IMAGE_URL'],
       ]);
       entry = {
         styleID: style,
@@ -146,11 +146,11 @@ async function build() {
     const colorImageRaw = pickImage([
       row['COLOR_PRODUCT_IMAGE'],
       row['COLOR_PRODUCT_IMAGE_THUMBNAIL'],
-      row['FRONT_MODEL_IMAGE_URL'],
-      row['BACK_MODEL_IMAGE_URL'],
       row['FRONT_FLAT_IMAGE_URL'],
       row['BACK_FLAT_IMAGE_URL'],
       row['PRODUCT_IMAGE'],
+      row['FRONT_MODEL_IMAGE_URL'],
+      row['BACK_MODEL_IMAGE_URL'],
     ]);
     const colorImage = resolveImage(colorImageRaw);
     if (colorName && !entry.colors.has(colorName)) {
@@ -167,7 +167,8 @@ async function build() {
 
     if (size && pricing) {
       const existing = entry.sizePrices.get(size);
-      if (!existing || cost < existing.cost) {
+      // Keep the highest cost/price per size to avoid underpricing when multiple price groups exist.
+      if (!existing || pricing.cost > existing.cost) {
         entry.sizePrices.set(size, { label: size, cost: pricing.cost, price: pricing.price, order: sizeOrder });
       }
     }

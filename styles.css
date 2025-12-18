@@ -440,16 +440,20 @@ main {
 
 .catalog-img-wrap {
   position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .catalog-card-img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.02);
-  object-fit: contain;
-  aspect-ratio: 4 / 5;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
   display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  object-position: top center;
 }
 
 .catalog-nav {
