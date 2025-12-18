@@ -62,7 +62,7 @@ exports.handler = async (event) => {
     const unique = [];
     const seen = new Set();
     for (const row of hits) {
-      const key = `${row.styleID || ""}-${row.partNumber || ""}`;
+      const key = `${row.styleID || ""}`;
       if (seen.has(key)) continue;
       seen.add(key);
       unique.push(row);
@@ -71,12 +71,12 @@ exports.handler = async (event) => {
     const withPricing = await Promise.all(
       unique.slice(0, 40).map(async (row) => {
         const tier = categoryTier(row);
-        const pricing = await fetchPricing(cleanBase, headers, row.styleID, row.partNumber, tier);
+        const pricing = await fetchPricing(cleanBase, headers, row.styleID, tier);
         return pricing ? { ...row, ...pricing } : row;
       })
     );
 
-    const sorted = sortResults(withPricing).map(({ score, partNumber, styleID, ...rest }) => rest);
+    const sorted = sortResults(withPricing).map(({ score, ...rest }) => rest);
     return json(200, { ok: true, count: sorted.length, results: sorted });
   }
 
@@ -92,7 +92,7 @@ exports.handler = async (event) => {
       urls.add(`${cleanBase}/V2/styles?styleid=${encodeURIComponent(q)}&limit=20&mediatype=json`);
     }
     variants.forEach((val) => {
-      urls.add(`${cleanBase}/V2/styles?partnumber=${encodeURIComponent(val)}&limit=20&mediatype=json`);
+      urls.add(`${cleanBase}/V2/styles?style=${encodeURIComponent(val)}&limit=20&mediatype=json`);
     });
   } else {
     // Non-SKU: broader searches
@@ -103,9 +103,6 @@ exports.handler = async (event) => {
       urls.add(`${cleanBase}/V2/styles?brand=${encodeURIComponent(brandFilter)}&limit=200&mediatype=json`);
       urls.add(`${cleanBase}/V2/styles?brandname=${encodeURIComponent(brandFilter)}&limit=200&mediatype=json`);
     }
-    variants.forEach((val) => {
-      urls.add(`${cleanBase}/V2/styles?partnumber=${encodeURIComponent(val)}&limit=20&mediatype=json`);
-    });
     variants.forEach((val) => {
       urls.add(`${cleanBase}/V2/styles?style=${encodeURIComponent(val)}&limit=20&mediatype=json`);
     });
@@ -129,7 +126,7 @@ exports.handler = async (event) => {
     const rawQueryLower = q.toLowerCase();
     const pool = isSkuQuery
       ? resultsCombined.filter((item) => {
-          const pn = String(item.partNumber || "").toLowerCase();
+          const pn = String(item.styleName || item.uniqueStyleName || item.title || "").toLowerCase();
           const sid = String(item.styleID || "").toLowerCase();
           return (pn && pn.includes(rawQueryLower)) || (sid && sid.includes(rawQueryLower));
         })
@@ -141,15 +138,15 @@ exports.handler = async (event) => {
     const scoreItem = (item) => {
       let score = 0;
       if (numericQ && String(item.styleID || "") === numericQ) score = Math.max(score, 100);
-      const pnNorm = normalize(item.partNumber);
-      if (pnNorm && normVariants.includes(pnNorm)) score = Math.max(score, 90);
-      const nameNorm = normalize(item.styleName || item.uniqueStyleName || item.title);
+      const styleNorm = normalize(item.styleName || item.uniqueStyleName || item.title);
+      if (styleNorm && normVariants.includes(styleNorm)) score = Math.max(score, 90);
+      const nameNorm = normalize(productName(item));
       if (nameNorm && normVariants.includes(nameNorm)) score = Math.max(score, 80);
-      if (pnNorm && normQ && pnNorm.startsWith(normQ)) score = Math.max(score, 70);
+      if (styleNorm && normQ && styleNorm.startsWith(normQ)) score = Math.max(score, 70);
 
       if (queryTokens.length) {
         const haystack = normalize(
-          `${item.styleName || ""} ${item.uniqueStyleName || ""} ${item.title || ""} ${item.brandName || ""} ${item.baseCategory || ""} ${item.description || ""} ${item.categories || ""}`
+          `${productName(item) || ""} ${item.styleName || ""} ${item.uniqueStyleName || ""} ${item.title || ""} ${item.brandName || ""} ${item.baseCategory || ""} ${item.description || ""} ${item.categories || ""}`
         );
         const matches = queryTokens.filter((tok) => haystack.includes(tok)).length;
         if (matches > 0) {
@@ -165,7 +162,7 @@ exports.handler = async (event) => {
 
     const matchesType = (item) => {
       if (!typeFilter) return true;
-      const text = normalize(`${item.baseCategory || ""} ${item.title || ""} ${item.styleName || ""} ${item.description || ""}`);
+      const text = normalize(`${item.baseCategory || ""} ${productName(item) || ""} ${item.title || ""} ${item.styleName || ""} ${item.description || ""}`);
       const tf = normalize(typeFilter);
       const typeMap = {
         SHORTSLEEVETEE: [/T[-\s]?SHIRT/, /SHORTSLEEVE/],
@@ -181,14 +178,11 @@ exports.handler = async (event) => {
     };
 
     for (const item of pool) {
-      const key = `${item.styleID || ""}-${item.partNumber || ""}-${item.styleName || ""}`;
+      const key = `${item.styleID || ""}-${item.styleName || ""}`;
       if (seen.has(key)) continue;
       seen.add(key);
       const styleIdStr = item.styleID ? String(item.styleID) : "";
-      const pnNorm = normalize(item.partNumber);
-      const nameNorm = normalize(item.styleName || item.uniqueStyleName || item.title);
-      const matchesSku = (numericQ && styleIdStr === numericQ) || pnNorm === normQ || nameNorm === normQ;
-      const partialSku = pnNorm && normQ && pnNorm.includes(normQ);
+      const nameNorm = normalize(productName(item));
 
       const score = scoreItem(item);
       if (score <= 0) continue;
@@ -205,9 +199,9 @@ exports.handler = async (event) => {
       deduped.push({
         score,
         styleID: item.styleID,
-        partNumber: item.partNumber,
         brandName: item.brandName,
         styleName: item.styleName || item.uniqueStyleName || item.title,
+        productName: productName(item),
         baseCategory: item.baseCategory,
         description: item.description,
         styleImage: imageUrl,
@@ -226,8 +220,8 @@ exports.handler = async (event) => {
     const filteredForSku = isSkuQuery
       ? deduped.filter((item) => {
           const idStr = item.styleID ? String(item.styleID) : "";
-          const pn = normalize(item.partNumber);
-          return (idStr && idStr.includes(normQ)) || (pn && pn.includes(normQ));
+          const name = normalize(productName(item) || item.styleName || "");
+          return (idStr && idStr.includes(normQ)) || (name && name.includes(normQ));
         })
       : deduped;
 
@@ -237,9 +231,9 @@ exports.handler = async (event) => {
       if (index && index.length) {
         const rawQ = q.toLowerCase();
         const matches = index.filter((row) => {
-          const pn = String(row.partNumber || "").toLowerCase();
           const sid = String(row.styleID || "").toLowerCase();
-          return (pn && pn.includes(rawQ)) || (sid && sid.includes(rawQ));
+          const name = String(row.productName || row.styleName || "").toLowerCase();
+          return (sid && sid.includes(rawQ)) || (name && name.includes(rawQ));
         });
         if (!matches.length) {
           return json(200, { ok: true, count: 0, results: [] });
@@ -249,7 +243,7 @@ exports.handler = async (event) => {
         const withPricingIndex = await Promise.all(
           matches.slice(0, 20).map(async (row) => {
             const tier = categoryTier(row);
-            const pricing = await fetchPricing(cleanBase, headers, row.styleID, row.partNumber, tier);
+            const pricing = await fetchPricing(cleanBase, headers, row.styleID, tier);
             return pricing ? { ...row, ...pricing } : row;
           })
         );
@@ -265,18 +259,18 @@ exports.handler = async (event) => {
     const withPricing = await Promise.all(
       filteredForSku.slice(0, 40).map(async (item) => {
         const tier = categoryTier(item);
-        const pricing = await fetchPricing(cleanBase, headers, item.styleID, item.partNumber, tier);
+        const pricing = await fetchPricing(cleanBase, headers, item.styleID, tier);
         return pricing ? { ...item, ...pricing } : item;
       })
     );
 
-    let trimmed = sortResults(withPricing).slice(0, 20).map(({ score, partNumber, styleID, ...rest }) => rest);
+    let trimmed = sortResults(withPricing).slice(0, 20).map(({ score, ...rest }) => rest);
 
     if (isSkuQuery) {
       trimmed = trimmed.filter((item) => {
-        const pn = String(item.partNumber || "").toLowerCase();
         const sid = String(item.styleID || "").toLowerCase();
-        return pn.includes(rawQueryLower) || sid.includes(rawQueryLower);
+        const name = String(productName(item) || item.styleName || "").toLowerCase();
+        return sid.includes(rawQueryLower) || (name && name.includes(rawQueryLower));
       });
     }
 
@@ -319,8 +313,12 @@ function normalize(str) {
   return String(str || "").replace(/\s+/g, "").toUpperCase();
 }
 
+function productName(item) {
+  return item.productName || item.uniqueStyleName || item.title || item.styleName || "";
+}
+
 // Optional local style index to support partial SKU lookups.
-// Expected shape: [{ styleID, partNumber, brandName, styleName, baseCategory }]
+// Expected shape: [{ styleID, brandName, styleName, productName, baseCategory }]
 let _localIndexCache = null;
 function loadLocalIndex() {
   if (_localIndexCache !== null) return _localIndexCache;
@@ -352,15 +350,16 @@ async function searchLocalIndex(q, base, headers) {
   const rawQ = String(q || '').toLowerCase();
   const matches = index.filter((row) => {
     const sn = String(row.styleName || '').toLowerCase();
-    return sn && sn.includes(rawQ);
+    const name = String(row.productName || '').toLowerCase();
+    return (sn && sn.includes(rawQ)) || (name && name.includes(rawQ));
   });
   if (!matches.length) return [];
 
-  // Dedup by styleID + partNumber
+  // Dedup by styleID
   const seen = new Set();
   const unique = [];
   for (const row of matches) {
-    const key = `${row.styleID || ''}-${row.partNumber || ''}`;
+    const key = `${row.styleID || ''}`;
     if (seen.has(key)) continue;
     seen.add(key);
     unique.push(row);
@@ -369,7 +368,7 @@ async function searchLocalIndex(q, base, headers) {
   const withPricing = await Promise.all(
     unique.slice(0, 20).map(async (row) => {
       const tier = categoryTier(row);
-      const pricing = await fetchPricing(base, headers, row.styleID, row.partNumber, tier);
+      const pricing = await fetchPricing(base, headers, row.styleID, tier);
       return pricing ? { ...row, ...pricing } : row;
     })
   );
@@ -386,7 +385,7 @@ function sortResults(arr) {
       const scoreA = a.score || 0;
       const scoreB = b.score || 0;
       if (scoreB !== scoreA) return scoreB - scoreA;
-      return String(a.styleName || '').localeCompare(String(b.styleName || ''));
+      return String(productName(a) || '').localeCompare(String(productName(b) || ''));
     });
 }
 
@@ -448,10 +447,9 @@ function isAllowedCategory(item) {
   return true;
 }
 
-async function fetchPricing(base, headers, styleID, partNumber, tier, requireSale = false) {
-  const styleIdParam = styleID ? `styleid=${encodeURIComponent(styleID)}` : partNumber ? `partnumber=${encodeURIComponent(partNumber)}` : null;
-  if (!styleIdParam) return null;
-  const url = `${base}/V2/products?${styleIdParam}&limit=200&mediatype=json`;
+async function fetchPricing(base, headers, styleID, tier, requireSale = false) {
+  if (!styleID) return null;
+  const url = `${base}/V2/products?styleid=${encodeURIComponent(styleID)}&limit=200&mediatype=json`;
   try {
     const res = await fetch(url, { headers });
     if (!res.ok) return null;

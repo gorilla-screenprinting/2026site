@@ -3,7 +3,7 @@
 /* ===== Theme tokens ===== */
 :root {
   /* Global color tokens */
-  --bkgd1: #fbe05d;
+  --bkgd1: #fbde5d;
   --bkgd2: #f8f5e9;
   --type1: var(--acct2);
   --type2: #ff2a5f;

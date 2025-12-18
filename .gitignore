@@ -14,3 +14,5 @@ embedded/quoter/
 
 # Deno/Edge lockfile (not used)
 deno.lock
+
+*/SanMar_SDL_DS.csv

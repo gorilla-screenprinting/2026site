@@ -810,7 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
       items.forEach((item) => {
         const card = document.createElement('article');
         card.className = 'catalog-card-item';
-        const sku = item.styleName || item.title || item.uniqueStyleName || 'Style';
+        const productName = item.productName || item.title || item.uniqueStyleName || item.styleName || 'Style';
+        // styleName is the human-facing style number (e.g., S700)
+        const sku = item.styleName || item.styleID || 'Style';
         const brand = item.brandName || '';
         const colors = Array.isArray(item.colorImages) ? item.colorImages : [];
         const sizePrices = Array.isArray(item.sizePrices) ? item.sizePrices : null;
@@ -827,14 +829,26 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.textContent = '›';
         const imgEl = document.createElement('img');
         imgEl.className = 'catalog-card-img';
-        imgEl.alt = sku;
+        imgEl.alt = productName;
         imgWrap.appendChild(prevBtn);
         imgWrap.appendChild(imgEl);
         imgWrap.appendChild(nextBtn);
 
         const brandLine = document.createElement('div');
         brandLine.className = 'catalog-brandline';
-        brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+        const setBrandLine = () => {
+          const parts = [brand];
+          const prod = (productName || '').trim();
+          const style = (sku || '').trim();
+          if (prod && prod.toLowerCase() !== style.toLowerCase()) {
+            parts.push(prod);
+          }
+          if (style) {
+            parts.push(style);
+          }
+          brandLine.textContent = parts.filter(Boolean).join(' | ');
+        };
+        setBrandLine();
 
         const colorLine = document.createElement('div');
         colorLine.className = 'catalog-colorline';
@@ -864,7 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!colors.length) {
             imgEl.src = item.styleImage || '';
             colorLine.textContent = '';
-            brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+            setBrandLine();
             return;
           }
           idx = (i + colors.length) % colors.length;
@@ -872,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
           imgEl.src = c.image || item.styleImage || '';
           const colorName = c.name || '';
           colorLine.textContent = colorName ? `Color: ${colorName}` : '';
-          brandLine.textContent = [brand, sku].filter(Boolean).join(' - ');
+          setBrandLine();
         };
 
         prevBtn.addEventListener('click', () => setImage(idx - 1));

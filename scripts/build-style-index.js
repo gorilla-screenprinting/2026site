@@ -3,6 +3,24 @@ const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
 
+// Load .env manually so npm scripts don't require env export
+function loadEnvFromDotenv() {
+  const envPath = path.join(process.cwd(), '.env');
+  if (!fs.existsSync(envPath)) return;
+  const raw = fs.readFileSync(envPath, 'utf8');
+  raw.split(/\r?\n/).forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+    if (!match) return;
+    const [, key, valRaw] = match;
+    if (process.env[key] !== undefined) return;
+    const unquoted = valRaw.replace(/^['"]|['"]$/g, '');
+    process.env[key] = unquoted;
+  });
+}
+loadEnvFromDotenv();
+
 const EXCLUDED_BASE_CATEGORIES = new Set([
   'Accessories',
   'Wovens',
@@ -32,6 +50,20 @@ async function main() {
   const limit = 500;
   let page = 1;
   const collected = [];
+  const seen = new Set();
+
+  const normalizeSku = (val) => String(val || '').replace(/\s+/g, '').toUpperCase();
+  const makeProductName = (item) => {
+    const sku = item.styleName || '';
+    const primary = (item.uniqueStyleName || '').trim();
+    const title = (item.title || '').trim();
+    const skuNorm = normalizeSku(sku);
+    const primaryNorm = normalizeSku(primary);
+    const titleNorm = normalizeSku(title);
+    if (primary && primaryNorm !== skuNorm) return primary;
+    if (title && titleNorm !== skuNorm) return title;
+    return sku;
+  };
 
   console.log('Building style index from S&S...');
   while (true) {
@@ -48,19 +80,29 @@ async function main() {
       break;
     }
 
+    let added = 0;
     for (const item of data) {
       const bc = item.baseCategory || '';
       if (shouldExcludeCategory(bc)) continue;
+      if (seen.has(item.styleID)) continue;
+      seen.add(item.styleID);
+      added += 1;
+      const productName = makeProductName(item);
       collected.push({
         styleID: item.styleID,
         brandName: item.brandName,
         styleName: item.styleName || item.uniqueStyleName || item.title,
+        productName,
         baseCategory: bc,
         styleImage: item.styleImage,
       });
     }
 
     if (data.length < limit) {
+      break;
+    }
+    if (page > 1 && added === 0) {
+      console.log('No new styles found on this page, stopping.');
       break;
     }
     page += 1;
