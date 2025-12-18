@@ -32,11 +32,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet notes/ss-style-index.json; then
+          if git diff --quiet catalog-data/ss-style-index.json; then
             echo "No changes to index."
             exit 0
           fi
-          git add notes/ss-style-index.json
+          git add catalog-data/ss-style-index.json
           git commit -m "chore: update S&S style index"
           git push
         env:

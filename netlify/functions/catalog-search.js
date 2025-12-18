@@ -48,6 +48,7 @@ exports.handler = async (event) => {
   // Brand/style browse path: use local index, exact brand/baseCategory match, then fetch pricing
   if (!isSkuQuery && (brandFilter || typeFilter)) {
     const index = loadLocalIndex();
+    const sanmar = searchSanmarIndex({ q, brand: brandFilter, type: typeFilter });
     const matchBrand = (row) => {
       if (!brandFilter) return true;
       return String(row.brandName || "").toLowerCase().trim() === brandFilter.toLowerCase().trim();
@@ -77,13 +78,16 @@ exports.handler = async (event) => {
     );
 
     const sorted = sortResults(withPricing).map(({ score, ...rest }) => rest);
-    return json(200, { ok: true, count: sorted.length, results: sorted });
+    const merged = sortResults([...sorted, ...sanmar]).map(({ score, ...rest }) => rest);
+    return json(200, { ok: true, count: merged.length, results: merged });
   }
 
   // For SKU-style queries, rely on the local index for substring matching, then fetch pricing
   if (isSkuQuery) {
     const indexHits = await searchLocalIndex(q, cleanBase, headers);
-    return json(200, { ok: true, count: indexHits.length, results: indexHits });
+    const sanmarHits = searchSanmarIndex({ q, brand: brandFilter, type: typeFilter });
+    const merged = sortResults([...indexHits, ...sanmarHits]).map(({ score, ...rest }) => rest);
+    return json(200, { ok: true, count: merged.length, results: merged });
   }
 
   if (isSkuQuery) {
@@ -274,7 +278,10 @@ exports.handler = async (event) => {
       });
     }
 
-    return json(200, { ok: true, count: trimmed.length, results: trimmed });
+    const sanmarHits = searchSanmarIndex({ q, brand: brandFilter, type: typeFilter }).map(({ score, ...rest }) => rest);
+    const merged = sortResults([...trimmed, ...sanmarHits]).map(({ score, ...rest }) => rest);
+
+    return json(200, { ok: true, count: merged.length, results: merged });
   } catch (err) {
     return json(502, { ok: false, error: String(err?.message || err) });
   }
@@ -325,7 +332,7 @@ function loadLocalIndex() {
   try {
     const fs = require("fs");
     const path = require("path");
-    const idxPath = path.join(process.cwd(), "notes", "ss-style-index.json");
+    const idxPath = path.join(process.cwd(), "catalog-data", "ss-style-index.json");
     if (!fs.existsSync(idxPath)) {
       _localIndexCache = [];
       return _localIndexCache;
@@ -343,6 +350,30 @@ function loadLocalIndex() {
   return _localIndexCache;
 }
 exports.loadLocalIndex = loadLocalIndex;
+
+let _sanmarIndexCache = null;
+function loadSanmarIndex() {
+  if (_sanmarIndexCache !== null) return _sanmarIndexCache;
+  try {
+    const fs = require("fs");
+    const path = require("path");
+    const idxPath = path.join(process.cwd(), "catalog-data", "sanmar-index.json");
+    if (!fs.existsSync(idxPath)) {
+      _sanmarIndexCache = [];
+      return _sanmarIndexCache;
+    }
+    const raw = fs.readFileSync(idxPath, "utf8");
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      _sanmarIndexCache = data;
+    } else {
+      _sanmarIndexCache = [];
+    }
+  } catch {
+    _sanmarIndexCache = [];
+  }
+  return _sanmarIndexCache;
+}
 
 async function searchLocalIndex(q, base, headers) {
   const index = loadLocalIndex();
@@ -373,6 +404,101 @@ async function searchLocalIndex(q, base, headers) {
     })
   );
   return sortResults(withPricing);
+}
+
+function searchSanmarIndex({ q, brand, type }) {
+  const index = loadSanmarIndex();
+  if (!index || !index.length) return [];
+  const rawQ = String(q || "").toLowerCase();
+  const normQ = normalize(q);
+  const tokens = Array.from(new Set(String(q || "").split(/\s+/).map(normalize).filter(Boolean)));
+  const brandFilter = (brand || "").toLowerCase();
+  const typeFilter = (type || "").trim();
+
+  const matchesType = (item) => {
+    if (!typeFilter) return true;
+    const text = normalize(`${item.baseCategory || ""} ${productName(item) || ""} ${item.styleName || ""}`);
+    const tf = normalize(typeFilter);
+    const typeMap = {
+      SHORTSLEEVETEE: [/T[-\s]?SHIRT/, /SHORTSLEEVE/],
+      LONGSLEEVETEE: [/LONGSLEEVE/],
+      PULLOVERHOODIE: [/HOOD/, /PULLOVER/],
+      ZIPHOODIE: [/HOOD/, /ZIP/],
+      CREWNECKFLEECE: [/CREW/],
+      TOTEBAG: [/TOTE/],
+      TANK: [/TANK/],
+    };
+    const patterns = typeMap[tf] || [];
+    if (!patterns.length) return true;
+    return patterns.some((rx) => rx.test(text));
+  };
+
+  const results = [];
+  for (const item of index) {
+    if (brandFilter && String(item.brandName || "").toLowerCase() !== brandFilter) continue;
+    if (!matchesType(item)) continue;
+    const pname = String(productName(item) || "").toLowerCase();
+    const sname = String(item.styleName || "").toLowerCase();
+    const hay = `${pname} ${sname}`;
+    if (rawQ && !hay.includes(rawQ) && !tokens.some((t) => hay.includes(t.toLowerCase()))) {
+      continue;
+    }
+    let score = 0;
+    if (normQ && normalize(item.styleName || "") === normQ) score = Math.max(score, 90);
+    if (normQ && normalize(productName(item)) === normQ) score = Math.max(score, 80);
+    if (rawQ && sname.includes(rawQ)) score = Math.max(score, 75);
+    if (rawQ && pname.includes(rawQ)) score = Math.max(score, 70);
+    const matches = tokens.filter((t) => hay.includes(t.toLowerCase())).length;
+    if (matches) score = Math.max(score, 60 + matches * 5);
+    const colorImages = Array.isArray(item.colors)
+      ? item.colors
+          .filter((c) => c && c.image)
+          .map((c) => ({ name: c.name, image: withSanmarCdn(c.image) }))
+      : [];
+    const styleImage = withSanmarCdn(item.styleImage);
+    const groupedSizes = groupSizePrices(item.sizePrices);
+    results.push({
+      ...item,
+      styleImage,
+      colorImages,
+      sizePrices: groupedSizes,
+      totalQty: 0,
+      score,
+    });
+  }
+  return sortResults(results);
+}
+
+function withSanmarCdn(img) {
+  if (!img) return "";
+  if (/^https?:\/\//i.test(img)) return img;
+  const base = (process.env.SANMAR_CDN_BASE || "https://cdnm.sanmar.com/imglib/mresjpg/2024/f12/").replace(/\/+$/, "") + "/";
+  return `${base}${img.replace(/^\/+/, "")}`;
+}
+
+function groupSizePrices(prices) {
+  const arr = Array.from(prices || []).filter((p) => p && Number.isFinite(p.price));
+  if (!arr.length) return [];
+  const ordered = arr
+    .map((p) => ({ ...p, _order: sizeLabelOrder(p.label) }))
+    .sort((a, b) => a._order - b._order || String(a.label).localeCompare(String(b.label)));
+  const groups = [];
+  let cur = null;
+  for (const p of ordered) {
+    const samePrice = cur && p.price === cur.price && p.cost === cur.cost && p._order === cur._lastOrder + 1;
+    if (cur && samePrice) {
+      cur.to = p.label;
+      cur._lastOrder = p._order;
+    } else {
+      if (cur) groups.push(cur);
+      cur = { from: p.label, to: p.label, price: p.price, cost: p.cost, _lastOrder: p._order };
+    }
+  }
+  if (cur) groups.push(cur);
+  return groups.map((g) => {
+    const label = g.from === g.to ? g.from : `${g.from}-${g.to}`;
+    return { label, price: g.price, cost: g.cost };
+  });
 }
 
 function sortResults(arr) {
@@ -447,6 +573,8 @@ function isAllowedCategory(item) {
   return true;
 }
 
+const { applyMarkup, roundToNickel } = require("../../pricing");
+
 async function fetchPricing(base, headers, styleID, tier, requireSale = false) {
   if (!styleID) return null;
   const url = `${base}/V2/products?styleid=${encodeURIComponent(styleID)}&limit=200&mediatype=json`;
@@ -457,7 +585,6 @@ async function fetchPricing(base, headers, styleID, tier, requireSale = false) {
     const data = JSON.parse(text);
     if (!Array.isArray(data) || !data.length) return null;
 
-    const add = tier === "hoodie" ? 7 : 3.5;
     const byLabel = new Map();
     const colors = new Set();
     const colorImages = new Map(); // name -> image url
@@ -506,17 +633,19 @@ async function fetchPricing(base, headers, styleID, tier, requireSale = false) {
       const baseCost = caseCost;
       if (!Number.isFinite(baseCost) || baseCost <= 0) continue;
       if (isWhite(p)) continue; // skip white-based pricing
-      const retail = roundToNickel(baseCost + add);
+      const pricing = applyMarkup(baseCost, tier);
+      if (!pricing) continue;
+      const retail = pricing.price;
       const label = labelFor(p);
 
       const entry = byLabel.get(label);
       if (!entry) {
-        byLabel.set(label, { price: retail, cost: baseCost });
+        byLabel.set(label, { price: retail, cost: pricing.cost });
       } else {
         // pick the highest non-white retail price for safety
         if (retail > entry.price) {
           entry.price = retail;
-          entry.cost = baseCost;
+          entry.cost = pricing.cost;
         }
       }
     }
@@ -527,15 +656,17 @@ async function fetchPricing(base, headers, styleID, tier, requireSale = false) {
         const caseCost = rawVal(p, "casePrice") ?? rawVal(p, "caseprice") ?? rawVal(p, "case_price") ?? rawVal(p, "caseQtyPrice") ?? rawVal(p, "caseqtyprice");
         const baseCost = caseCost;
         if (!Number.isFinite(baseCost) || baseCost <= 0) continue;
-        const retail = roundToNickel(baseCost + add);
+        const pricing = applyMarkup(baseCost, tier);
+        if (!pricing) continue;
+        const retail = pricing.price;
         const label = labelFor(p);
         const entry = byLabel.get(label);
         if (!entry) {
-          byLabel.set(label, { price: retail, cost: baseCost });
+          byLabel.set(label, { price: retail, cost: pricing.cost });
         } else {
           if (retail > entry.price) {
             entry.price = retail;
-            entry.cost = baseCost;
+            entry.cost = pricing.cost;
           }
         }
       }
@@ -579,11 +710,6 @@ function categoryTier(item) {
     return "hoodie";
   }
   return "tee";
-}
-
-function roundToNickel(val) {
-  if (!Number.isFinite(val)) return val;
-  return Math.ceil(val * 20) / 20; // 0.05 = 1/20
 }
 
 function sizeLabelOrder(label) {

@@ -3,7 +3,7 @@
   functions = "netlify/functions"
 
 [functions]
-  included_files = ["notes/ss-style-index.json"]
+  included_files = ["catalog-data/ss-style-index.json", "catalog-data/sanmar-index.json"]
 
 [[edge_functions]]
   path = "/ping"

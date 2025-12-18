@@ -1,34 +1,27 @@
-# Gorilla Blanks Catalog
+# Gorilla Blanks Site
 
-Single-page site with Netlify Functions-backed catalog search using the S&S API and a local style index for fast partial lookups.
+Single-page catalog/search site backed by Netlify Functions and vendor indexes.
 
-## Structure
-- `index.html`, `main.js`, `styles.css` — frontend.
-- `netlify/functions/` — serverless functions (`catalog-search`, `catalog-meta`).
-- `notes/ss-style-index.json` — local style index (brand/styleName/baseCategory/styleID/styleImage) used for partial search and dropdown options.
-- `scripts/build-style-index.js` — builds the local index from the S&S API (filtered categories).
-- `.github/workflows/update-ss-index.yml` — monthly GitHub Action to rebuild the index (uses repo secrets).
-- `assets/`, `embedded/` — static assets and embeds.
+## How it works
+- Frontend: `index.html`, `main.js`, `styles.css` (vanilla JS). Sections are wired up from `main.js`.
+- Serverless: `netlify/functions/`
+  - `catalog-search`: talks to S&S live API and local indexes for search/pricing.
+  - `catalog-meta`: exposes brand/category metadata from the local S&S index.
+  - `google-reviews`: pulls reviews for the Reviews section.
+- Catalog data: lives in `catalog-data/` (see `catalog-data/README.md` for details, build steps, and exclusions).
 
-## Search flows
-- **SKU/numeric queries**: search the local index by styleName contains, then fetch live pricing/images via `/V2/products` using `styleID`.
-- **Brand/Style browse**: dropdowns populated from the index; results filtered by `brandName` and `baseCategory`, then priced via `/V2/products`.
-- Results are sorted by highest total stock (`totalQty`) first, then relevance.
+## Dev setup
+1) Install deps: `npm install`
+2) Run dev server: `npx -y netlify-cli@latest dev`
+   - Ensure `catalog-data/ss-style-index.json` exists (run `npm run build:ss-index` with env creds) or the search won’t populate.
+   - Optional: build SanMar index if using that data (`npm run build:sanmar-index` with `catalog-data/SanMar_SDL_DS.csv` present).
+3) Environment: set `VENDOR_USERNAME`/`VENDOR_PASSWORD` (S&S API) in `.env` or your shell for S&S index builds.
 
-## Local index
-- Build manually: `VENDOR_USERNAME=... VENDOR_PASSWORD=... npm run build:ss-index`
-- File: `notes/ss-style-index.json` (filtered: excludes Accessories, Wovens, Outerwear, Knits & Layering).
-- Keep it committed so Netlify Functions can read it.
-
-## CI index updates
-- Add GitHub secrets: `VENDOR_USERNAME`, `VENDOR_PASSWORD`.
-- Workflow `.github/workflows/update-ss-index.yml` runs monthly (and on-demand) to rebuild and commit `notes/ss-style-index.json`.
-
-## Dev
-- Install deps: `npm install`
-- Run dev: `npx -y netlify-cli@latest dev`
-- Rebuild index if needed before dev so functions see the latest file.
+## Key scripts
+- `npm run build:ss-index` — build S&S style index (writes `catalog-data/ss-style-index.json`).
+- `npm run build:sanmar-index` — build SanMar index from `catalog-data/SanMar_SDL_DS.csv` (writes `catalog-data/sanmar-index.json`).
 
 ## Notes
-- `styleID` is required to price/fetch images from S&S `/V2/products`.
-- `styleImage` in the index is used as a fallback when color images are missing.
+- Netlify includes `catalog-data/ss-style-index.json` in the function bundle (see `netlify.toml`).
+- Catalog search returns combined results from live S&S + S&S index + SanMar static index (when present).
+- Category exclusions are documented in `catalog-data/README.md` for both S&S and SanMar (easy to adjust later).

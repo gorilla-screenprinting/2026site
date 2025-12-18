@@ -6,6 +6,7 @@
     "node-fetch": "^2.7.0"
   },
   "scripts": {
-    "build:ss-index": "node scripts/build-style-index.js"
+    "build:ss-index": "node scripts/build-ss-index.js",
+    "build:sanmar-index": "node scripts/build-sanmar-index.js"
   }
 }
