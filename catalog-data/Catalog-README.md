@@ -33,3 +33,36 @@ Catalog data indices that power the Netlify Functions-backed search UI.
 - baseCategory/subcategory: from `CATEGORY_NAME` / `SUBCATEGORY_NAME` (can be remapped to S&S-like buckets if needed).
 - colors: `COLOR_NAME` + `COLOR_PRODUCT_IMAGE` (fallback to `PRODUCT_IMAGE`).
 - pricing: `PIECE_PRICE` treated as cost; markup applied in the builder (+3.5 tees, +7 hoodies/fleece/zip) to produce display `price`.
+
+## Example entry: Gildan 18500
+
+SanMar shape (raw CSV fields):
+```json
+{
+  "STYLE#": "18500",
+  "MILL": "Gildan",
+  "PRODUCT_TITLE": "Gildan® - Heavy Blend Hooded Sweatshirt.  18500",
+  "CATEGORY_NAME": "Sweatshirts/Fleece",
+  "SUBCATEGORY_NAME": "Hoodie",
+  "COLOR_NAME": "White",
+  "SIZE": "S",
+  "PIECE_PRICE": "14.32",
+  "CASE_PRICE": "12.32",
+  "PRODUCT_IMAGE": "18500.jpg",
+  "COLOR_PRODUCT_IMAGE": "18500_white_model_front.jpg",
+  "FRONT_FLAT_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2019/f14/18500_white_flat_front.jpg",
+  "PRODUCT_STATUS": "Regular"
+}
+```
+
+S&S shape (style-level from S&S API, as stored in `ss-style-index.json`):
+```json
+{
+  "styleID": 395,
+  "brandName": "Gildan",
+  "styleName": "18500",
+  "productName": "Unisex Heavy Blend™ Hooded Sweatshirt",
+  "baseCategory": "Fleece - Core - Hood",
+  "styleImage": "Images/Style/395_fm.jpg"
+}
+```

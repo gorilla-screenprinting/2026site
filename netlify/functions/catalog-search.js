@@ -4,10 +4,7 @@ exports.handler = async (event) => {
   const baseUrl = process.env.VENDOR_BASE_URL || "https://api.ssactivewear.com";
   const styleIdOverride = process.env.VENDOR_HEALTH_STYLE_ID || "39"; // used as a safe fallback
   const cdnBase = (process.env.VENDOR_CDN_BASE || "https://cdn.ssactivewear.com/").replace(/\/+$/, "") + "/";
-
-  if (!username || !password) {
-    return json(500, { ok: false, error: "Missing VENDOR_USERNAME or VENDOR_PASSWORD" });
-  }
+  const hasCreds = Boolean(username && password);
 
   const preset = "";
   const brandFilter = (event.queryStringParameters?.brand || "").trim();
@@ -21,11 +18,13 @@ exports.handler = async (event) => {
     return json(400, { ok: false, error: "Missing search query (style ID or part number)" });
   }
 
-  const auth = Buffer.from(`${username}:${password}`).toString("base64");
-  const headers = {
-    Authorization: `Basic ${auth}`,
-    Accept: "application/json",
-  };
+  const auth = hasCreds ? Buffer.from(`${username}:${password}`).toString("base64") : "";
+  const headers = hasCreds
+    ? {
+        Authorization: `Basic ${auth}`,
+        Accept: "application/json",
+      }
+    : null;
 
   const cleanBase = baseUrl.replace(/\/+$/, "");
   const urls = new Set();
@@ -69,13 +68,15 @@ exports.handler = async (event) => {
       unique.push(row);
     }
 
-    const withPricing = await Promise.all(
-      unique.slice(0, 40).map(async (row) => {
-        const tier = categoryTier(row);
-        const pricing = await fetchPricing(cleanBase, headers, row.styleID, tier);
-        return pricing ? { ...row, ...pricing } : row;
-      })
-    );
+    const withPricing = hasCreds
+      ? await Promise.all(
+          unique.slice(0, 40).map(async (row) => {
+            const tier = categoryTier(row);
+            const pricing = await fetchPricing(cleanBase, headers, row.styleID, tier);
+            return pricing ? { ...row, ...pricing } : row;
+          })
+        )
+      : unique;
 
     const sorted = sortResults(withPricing).map(({ score, ...rest }) => rest);
     const merged = sortResults([...sorted, ...sanmar]).map(({ score, ...rest }) => rest);
@@ -84,7 +85,7 @@ exports.handler = async (event) => {
 
   // For SKU-style queries, rely on the local index for substring matching, then fetch pricing
   if (isSkuQuery) {
-    const indexHits = await searchLocalIndex(q, cleanBase, headers);
+    const indexHits = hasCreds ? await searchLocalIndex(q, cleanBase, headers) : searchLocalIndexLite(q);
     const sanmarHits = searchSanmarIndex({ q, brand: brandFilter, type: typeFilter });
     const merged = sortResults([...indexHits, ...sanmarHits]).map(({ score, ...rest }) => rest);
     return json(200, { ok: true, count: merged.length, results: merged });
@@ -124,7 +125,11 @@ exports.handler = async (event) => {
 
     // If even the known-good style returns nothing, assume upstream connectivity/auth issue
     if (fallbackCheck.length === 0) {
-      return json(502, { ok: false, error: "Upstream S&S API unreachable" });
+      // Fall back to local + SanMar
+      const fallbackLocal = searchLocalIndexLite(q);
+      const fallbackSanmar = searchSanmarIndex({ q, brand: brandFilter, type: typeFilter });
+      const mergedFallback = sortResults([...fallbackLocal, ...fallbackSanmar]).map(({ score, ...rest }) => rest);
+      return json(200, { ok: true, count: mergedFallback.length, results: mergedFallback });
     }
 
     const rawQueryLower = q.toLowerCase();
@@ -263,7 +268,7 @@ exports.handler = async (event) => {
     const withPricing = await Promise.all(
       filteredForSku.slice(0, 40).map(async (item) => {
         const tier = categoryTier(item);
-        const pricing = await fetchPricing(cleanBase, headers, item.styleID, tier);
+        const pricing = hasCreds ? await fetchPricing(cleanBase, headers, item.styleID, tier) : null;
         return pricing ? { ...item, ...pricing } : item;
       })
     );
@@ -283,7 +288,10 @@ exports.handler = async (event) => {
 
     return json(200, { ok: true, count: merged.length, results: merged });
   } catch (err) {
-    return json(502, { ok: false, error: String(err?.message || err) });
+    const fallbackLocal = searchLocalIndexLite(q);
+    const fallbackSanmar = searchSanmarIndex({ q, brand: brandFilter, type: typeFilter });
+    const mergedFallback = sortResults([...fallbackLocal, ...fallbackSanmar]).map(({ score, ...rest }) => rest);
+    return json(200, { ok: true, count: mergedFallback.length, results: mergedFallback });
   }
 };
 
@@ -351,6 +359,27 @@ function loadLocalIndex() {
 }
 exports.loadLocalIndex = loadLocalIndex;
 
+function searchLocalIndexLite(q) {
+  const index = loadLocalIndex();
+  if (!index || !index.length) return [];
+  const rawQ = String(q || '').toLowerCase();
+  const matches = index.filter((row) => {
+    const sn = String(row.styleName || '').toLowerCase();
+    const name = String(row.productName || '').toLowerCase();
+    return (sn && sn.includes(rawQ)) || (name && name.includes(rawQ));
+  });
+  if (!matches.length) return [];
+  const seen = new Set();
+  const unique = [];
+  for (const row of matches) {
+    const key = `${row.styleID || ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push({ ...row, totalQty: 0, sizePrices: [], colors: [], colorImages: [] });
+  }
+  return sortResults(unique);
+}
+
 let _sanmarIndexCache = null;
 function loadSanmarIndex() {
   if (_sanmarIndexCache !== null) return _sanmarIndexCache;
@@ -407,6 +436,7 @@ async function searchLocalIndex(q, base, headers) {
 }
 
 function searchSanmarIndex({ q, brand, type }) {
+  return [];
   const index = loadSanmarIndex();
   if (!index || !index.length) return [];
   const rawQ = String(q || "").toLowerCase();

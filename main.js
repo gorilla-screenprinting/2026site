@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleries = [
       {
         id: 'gallery1',
-        title: 'Client Work',
+        title: 'Print Work',
         folder: './assets/gallery/gallery1/',
         files: [
           
@@ -524,7 +524,13 @@ document.addEventListener('DOMContentLoaded', () => {
           { title: 'Dri-Duck', file: 'dri.png', url: 'https://www.ssactivewear.com/ps/dri_duck' },
           { title: 'Russell', file: 'rus.png', url: 'https://www.ssactivewear.com/ps/russell_athletic' },
           { title: 'LA Apparel', file: 'laa.png', url: 'https://www.losangelesapparel-imprintable.net/New/New/' },
+          { title: 'Bella Canvas', file: 'b+c.png', url: 'https://www.ssactivewear.com/ps/bella#__plpGrid' },
           { title: 'Independent Trading', file: 'itc.png', url: 'https://www.ssactivewear.com/ps/independent_trading_co#__plpGrid' },
+          { title: 'American Apparel', file: 'ama.png', url: 'https://www.ssactivewear.com/ps/american_apparel' },
+          { title: 'Realtree', file: 'rea.png', url: 'https://www.ssactivewear.com/ps/realtree' },
+          { title: 'Bayside', file: 'bay.png', url: 'https://www.ssactivewear.com/ps/bayside' },
+          { title: 'Port & Compnay', file: 'poc.png', url: 'https://www.sanmar.com/Brands/Port-%26-Co/c/bra-portcompany?perPage=48&sortCriteria=relevance' },
+          { title: 'Richardson', file: 'ric.png', url: 'https://www.ssactivewear.com/ps/richardson' },
         ],
       },
     };

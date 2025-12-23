@@ -3,21 +3,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================
   // DVD-style bouncing emoji
   // =========================
-  const dvdEmoji = document.getElementById('dvd-emoji');
-
+  const dvdContainer = document.getElementById('dvd-emoji-container');
   const toggleBtn = document.getElementById('banana-toggle');
 
-  if (dvdEmoji) {
+  if (dvdContainer) {
+    const BANANA_COUNT = 6;
+    const bananas = [];
+
     const bounds = () => {
       const w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
       const h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
       return { w, h };
     };
-    const { w: bw, h: bh } = bounds();
-    let x = Math.random() * Math.max(1, bw - dvdEmoji.offsetWidth);
-    let y = Math.random() * Math.max(1, bh - dvdEmoji.offsetHeight);
-    let vx = 0.08; // px per ms horizontally
-    let vy = 0.06; // px per ms vertically
+
+    const makeBanana = () => {
+      const el = document.createElement('div');
+      el.className = 'dvd-emoji';
+      el.textContent = '🍌';
+      dvdContainer.appendChild(el);
+      const { w, h } = bounds();
+      const size = el.offsetWidth || 50;
+      return {
+        el,
+        x: Math.random() * Math.max(1, w - size),
+        y: Math.random() * Math.max(1, h - size),
+        vx: (Math.random() * 0.08 + 0.04) * (Math.random() < 0.5 ? -1 : 1),
+        vy: (Math.random() * 0.08 + 0.04) * (Math.random() < 0.5 ? -1 : 1),
+      };
+    };
+
+    for (let i = 0; i < BANANA_COUNT; i++) {
+      bananas.push(makeBanana());
+    }
 
     let isRunning = false;
 
@@ -28,42 +45,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const { w, h } = bounds();
       const inset = -10; // allow slight overshoot so it visually reaches edges
-      const maxX = w - dvdEmoji.offsetWidth - inset;
-      const maxY = h - dvdEmoji.offsetHeight - inset;
 
-      x += vx * dt;
-      y += vy * dt;
+      bananas.forEach((b) => {
+        const bw = b.el.offsetWidth || 50;
+        const bh = b.el.offsetHeight || 50;
+        const maxX = w - bw - inset;
+        const maxY = h - bh - inset;
 
-      if (x <= inset || x >= maxX) {
-        vx *= -1;
-        x = Math.max(inset, Math.min(x, maxX));
-      }
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
 
-      if (y <= inset || y >= maxY) {
-        vy *= -1;
-        y = Math.max(inset, Math.min(y, maxY));
-      }
+        if (b.x <= inset || b.x >= maxX) {
+          b.vx *= -1;
+          b.x = Math.max(inset, Math.min(b.x, maxX));
+        }
 
-      dvdEmoji.style.transform = `translate(${x}px, ${y}px)`;
+        if (b.y <= inset || b.y >= maxY) {
+          b.vy *= -1;
+          b.y = Math.max(inset, Math.min(b.y, maxY));
+        }
+
+        b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+      });
 
       if (isRunning) requestAnimationFrame(dvdStep);
     }
 
     window.addEventListener('resize', () => {
       const { w, h } = bounds();
-      x = Math.min(Math.max(0, x), Math.max(0, w - dvdEmoji.offsetWidth));
-      y = Math.min(Math.max(0, y), Math.max(0, h - dvdEmoji.offsetHeight));
+      bananas.forEach((b) => {
+        const bw = b.el.offsetWidth || 50;
+        const bh = b.el.offsetHeight || 50;
+        b.x = Math.min(Math.max(0, b.x), Math.max(0, w - bw));
+        b.y = Math.min(Math.max(0, b.y), Math.max(0, h - bh));
+      });
     });
 
     if (toggleBtn) {
       // initialize off
-      dvdEmoji.style.opacity = '0';
+      bananas.forEach((b) => (b.el.style.opacity = '0'));
 
       toggleBtn.addEventListener('click', () => {
         isRunning = !isRunning;
         const pressed = isRunning;
         toggleBtn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
-        dvdEmoji.style.opacity = pressed ? '0.8' : '0';
+        bananas.forEach((b) => (b.el.style.opacity = pressed ? '0.8' : '0'));
         if (pressed) {
           dvdStep.last = undefined;
           requestAnimationFrame(dvdStep);
@@ -151,6 +177,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const formStartInput = document.getElementById('formStart');
   const orderLines = document.getElementById('orderLines');
   const addProductBtn = document.getElementById('addProduct');
+  const thanksCard = document.getElementById('quote-thanks');
+  const refreshBtn = document.getElementById('quote-refresh');
+  const submitTarget = document.getElementById('quote-submit-target');
+  const cardShell = document.querySelector('.card');
+
+  const notifyHeight = () => {
+    const container = document.querySelector('.container');
+    const rect = container?.getBoundingClientRect();
+    const height = rect ? Math.ceil(rect.height) : (document.documentElement.scrollHeight || document.body.scrollHeight || 0);
+    window.parent.postMessage({ type: 'embedded-height', height }, '*');
+  };
 
   // record when user first saw the form (bot detection)
   if (formStartInput) {
@@ -168,6 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
     wrapper.className = 'orderLine';
     wrapper.id = `product${idx}`;
     wrapper.dataset.productIndex = String(idx);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'product-close';
+    closeBtn.setAttribute('aria-label', `Remove Product ${idx + 1}`);
+    closeBtn.textContent = '✕';
 
     // Print placements section
     const placements = document.createElement('div');
@@ -199,18 +242,36 @@ document.addEventListener('DOMContentLoaded', () => {
     label.textContent = `Product #${idx + 1}`;
 
     // Assemble product block — label, then garments, then placements
+    wrapper.appendChild(closeBtn);
     wrapper.appendChild(label);
     wrapper.appendChild(garments);
     wrapper.appendChild(placements);
     orderLines.appendChild(wrapper);
 
     productIndex++;
+    notifyHeight();
   }
 
   // Add product button
   if (addProductBtn) {
     addProductBtn.addEventListener('click', addProduct);
   }
+
+  const resetFormView = () => {
+    if (form) form.reset();
+    if (formStartInput) {
+      formStartInput.value = Date.now();
+    }
+    productIndex = 0;
+    if (orderLines) {
+      orderLines.innerHTML = '';
+    }
+    if (cardShell) cardShell.hidden = false;
+    if (thanksCard) thanksCard.hidden = true;
+    notifyHeight();
+  };
+  // Ensure the form is the only visible view on load
+  resetFormView();
 
   // Helpers
   function getOrdinal(n) {
@@ -286,7 +347,38 @@ document.addEventListener('DOMContentLoaded', () => {
     container.appendChild(div);
   }
 
-  // Event delegation for placement/garment buttons
+  function renumberProducts() {
+    if (!orderLines) return;
+    const wrappers = Array.from(orderLines.getElementsByClassName('orderLine'));
+    wrappers.forEach((wrapper, i) => {
+      const oldIdx = parseInt(wrapper.dataset.productIndex || `${i}`, 10);
+      wrapper.id = `product${i}`;
+      wrapper.dataset.productIndex = String(i);
+      const label = wrapper.querySelector('.product-label');
+      if (label) label.textContent = `Product #${i + 1}`;
+      const close = wrapper.querySelector('.product-close');
+      if (close) close.setAttribute('aria-label', `Remove Product ${i + 1}`);
+      const placements = wrapper.querySelector('.printPlacements');
+      if (placements) placements.id = `printPlacements${i}`;
+      const garments = wrapper.querySelector('.garments');
+      if (garments) garments.id = `garments${i}`;
+      wrapper.querySelectorAll('[name]').forEach((el) => {
+        const name = el.getAttribute('name') || '';
+        const newName = name
+          .replace(new RegExp(`(garmentQty)${oldIdx}_`, 'g'), `$1${i}_`)
+          .replace(new RegExp(`(garmentType)${oldIdx}_`, 'g'), `$1${i}_`)
+          .replace(new RegExp(`(placementName)${oldIdx}_`, 'g'), `$1${i}_`)
+          .replace(new RegExp(`(colors)${oldIdx}_`, 'g'), `$1${i}_`);
+        el.setAttribute('name', newName);
+      });
+      wrapper.querySelectorAll('[data-product-index]').forEach((el) => {
+        el.dataset.productIndex = String(i);
+      });
+    });
+    productIndex = wrappers.length;
+  }
+
+  // Event delegation for placement/garment buttons and product removal
   if (orderLines) {
     orderLines.addEventListener('click', (e) => {
       const target = e.target;
@@ -294,6 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const placementBtn = target.closest('.add-placement');
       const garmentBtn = target.closest('.add-garment');
+      const closeBtn = target.closest('.product-close');
 
       if (placementBtn) {
         const idx = parseInt(placementBtn.dataset.productIndex || '0', 10);
@@ -301,12 +394,24 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (garmentBtn) {
         const idx = parseInt(garmentBtn.dataset.productIndex || '0', 10);
         addGarment(idx);
+      } else if (closeBtn) {
+        const wrapper = closeBtn.closest('.orderLine');
+        if (!wrapper) return;
+        wrapper.remove();
+        renumberProducts();
+        notifyHeight();
       }
     });
   }
 
-  // Submit validation + redirect
+  // Submit validation + inline thank-you swap
   if (form) {
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        resetFormView();
+      });
+    }
+
     form.addEventListener('submit', (e) => {
       const productBlocks = document.getElementsByClassName('orderLine');
       const totalProducts = productBlocks.length;
@@ -343,10 +448,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // let the form post, then redirect to thank-you page
-      setTimeout(() => {
-        window.location.href = 'https://www.gorillaprintshop.com/thankyou';
-      }, 500);
+      // post to hidden target so the page doesn't navigate away
+      if (submitTarget) {
+        form.target = submitTarget.name || 'quote-submit-target';
+      }
+
+      // Swap to thank-you content
+      if (cardShell) {
+        cardShell.hidden = true;
+      }
+      if (thanksCard) {
+        thanksCard.hidden = false;
+      }
+      notifyHeight();
     });
   }
 });

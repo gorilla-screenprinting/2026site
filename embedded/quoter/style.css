@@ -197,10 +197,35 @@ label {
 
 /* Product box */
 .orderLine {
+  position: relative;
   margin-top: 1.3rem;
   padding: 1rem;
   border-radius: var(--radius);
   border: 2px solid var(--type2);
+}
+
+.product-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--type2);
+  background: transparent;
+  color: var(--type2);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.product-close:hover,
+.product-close:focus-visible {
+  background: rgba(255, 42, 95, 0.1); /* light tint of var(--type2) */
 }
 
 /* Garment row: wide text, narrow quantity */
@@ -256,18 +281,57 @@ textarea {
   padding: 10px 12px;
 }
 
+.thankyou-card {
+  background: var(--bkgd2);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  text-align: center;
+  color: var(--acct2);
+}
+
+.thankyou-card[hidden] {
+  display: none !important;
+}
+
+.thankyou-img {
+  width: min(420px, 100%);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.thankyou-copy h2 {
+  margin: 0 0 0.4rem;
+  color: var(--acct2);
+}
+
+.thankyou-copy p {
+  margin: 0;
+  color: var(--acct2);
+}
+
 /* Floating background emoji (DVD-style) */
-#dvd-emoji {
+#dvd-emoji-container {
   position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dvd-emoji {
+  position: absolute;
   top: 0;
   left: 0;
-  font-size: 200px;
-  width: 200px;
-  height: 200px;
+  font-size: 50px;
+  width: 50px;
+  height: 50px;
   line-height: 1;
   pointer-events: none;
-  opacity: 0.8;
-  z-index: 0;
+  opacity: 0;
+  transition: opacity 120ms ease;
 }
 
 /* ========================

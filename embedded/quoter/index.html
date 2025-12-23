@@ -57,18 +57,27 @@
 
         </form>
       </div>
+
+      <div id="quote-thanks" class="thankyou-card" hidden>
+        <img class="thankyou-img" src="../../assets/2025 SUMMER.png" alt="Gorilla Means Quality banner">
+        <div class="thankyou-copy">
+          <h2>Quote Request Received!</h2>
+          <p>We'll reach out soon.</p>
+          <p>Have another project you need quoted? Tap refresh below.</p>
+        </div>
+        <button type="button" class="btn" id="quote-refresh">Refresh!</button>
+      </div>
     </div>
   </div>
-  
-  <div id="dvd-emoji" aria-hidden="true">🍌</div>
+
+  <div id="dvd-emoji-container" aria-hidden="true"></div>
+  <iframe id="quote-submit-target" name="quote-submit-target" title="Quote submission target" hidden></iframe>
 
   <script>
     const postHeight = () => {
       const container = document.querySelector('.container');
-      const rect = container?.getBoundingClientRect();
-      const measured = rect ? Math.ceil(rect.height) : 0;
-      const fallback = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const height = Math.max(measured, fallback);
+      const measured = container ? Math.ceil(container.scrollHeight) : 0;
+      const height = Math.max(0, measured);
       window.parent.postMessage({ type: 'embedded-height', height }, '*');
     };
     window.addEventListener('load', () => requestAnimationFrame(postHeight));

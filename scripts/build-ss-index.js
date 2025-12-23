@@ -52,19 +52,6 @@ async function main() {
   const collected = [];
   const seen = new Set();
 
-  const normalizeSku = (val) => String(val || '').replace(/\s+/g, '').toUpperCase();
-  const makeProductName = (item) => {
-    const sku = item.styleName || '';
-    const primary = (item.uniqueStyleName || '').trim();
-    const title = (item.title || '').trim();
-    const skuNorm = normalizeSku(sku);
-    const primaryNorm = normalizeSku(primary);
-    const titleNorm = normalizeSku(title);
-    if (primary && primaryNorm !== skuNorm) return primary;
-    if (title && titleNorm !== skuNorm) return title;
-    return sku;
-  };
-
   console.log('Building style index from S&S...');
   while (true) {
     const url = `${baseUrl}/V2/styles?page=${page}&limit=${limit}&mediatype=json`;
@@ -87,12 +74,11 @@ async function main() {
       if (seen.has(item.styleID)) continue;
       seen.add(item.styleID);
       added += 1;
-      const productName = makeProductName(item);
       collected.push({
         styleID: item.styleID,
         brandName: item.brandName,
         styleName: item.styleName || item.uniqueStyleName || item.title,
-        productName,
+        title: item.title || item.uniqueStyleName || item.styleName || '',
         baseCategory: bc,
         styleImage: item.styleImage,
       });

@@ -25,3 +25,9 @@ Single-page catalog/search site backed by Netlify Functions and vendor indexes.
 - Netlify includes `catalog-data/ss-style-index.json` in the function bundle (see `netlify.toml`).
 - Catalog search returns combined results from live S&S + S&S index + SanMar static index (when present).
 - Category exclusions are documented in `catalog-data/README.md` for both S&S and SanMar (easy to adjust later).
+
+## Future adds (catalog hardening)
+- Add per-IP throttling in `catalog-search` and short-lived in-function caching to cut bot traffic and API hits.
+- Debounce client searches and only pull live pricing/images on “real” actions (e.g., detail/quote).
+- Keep a lightweight public browse path; gate heavier calls behind a signed token/session if needed.
+- Consider simple bot friction (CAPTCHA/turnstile) if abuse appears; log IP/UA to spot spikes quickly.

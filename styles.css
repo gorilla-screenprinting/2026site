@@ -285,10 +285,26 @@ main {
   width: 100%;
 }
 
+#aboutus-section {
+  --section-color: var(--bkgd2);
+  color: var(--bkgd2);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('./assets/gorillabanner.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 700px) {
+  #aboutus-section {
+    background-position: right top;
+  }
+}
+
 /* ===== Galleries ===== */
-.gallery-collection {
-  display: grid;
-  gap: 2rem;
+.gallery-block:not(:last-child) {
+  margin-bottom: 2rem;
 }
 
 /* ===== Catalog search card ===== */
@@ -322,6 +338,10 @@ main {
 .catalog-head h2,
 .catalog-head p {
   color: var(--acct2);
+}
+
+.apparel-content h1 {
+  margin-top: 0;
 }
 
 .catalog-search-form {
@@ -508,12 +528,17 @@ main {
 }
 
 .catalog-card-item .pill {
-  display: inline-block;
-  padding: 0.2rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 0.65rem;
+  line-height: 1;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.05);
   font-size: 0.85rem;
-  margin-right: 0.35rem;
+  margin-right: 0;
+  white-space: nowrap;
 }
 
 .catalog-card-item .pill-price {
@@ -581,15 +606,13 @@ main {
 }
 
 .gallery-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.75rem;
+  display: none;
 }
 
 .gallery-block-title {
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: clamp(26px, 4vw, 32px);
+  line-height: 1.1;
 }
 
 .about-content .wave {
