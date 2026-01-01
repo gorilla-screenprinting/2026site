@@ -2376,14 +2376,6 @@
     "styleImage": "Images/Style/11688_fm.jpg"
   },
   {
-    "styleID": 7126,
-    "brandName": "American Apparel",
-    "styleName": "RSABB4237W",
-    "title": "Unisex Poly/Cotton Raglan Tee",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/7126_fm.jpg"
-  },
-  {
     "styleID": 6388,
     "brandName": "American Apparel",
     "styleName": "TR401",
@@ -3904,14 +3896,6 @@
     "styleImage": "Images/Style/5873_fm.jpg"
   },
   {
-    "styleID": 6568,
-    "brandName": "Augusta Sportswear",
-    "styleName": "5554",
-    "title": "Men's Stoked Tonal Heather Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/6568_fm.jpg"
-  },
-  {
     "styleID": 5681,
     "brandName": "Augusta Sportswear",
     "styleName": "580",
@@ -4704,14 +4688,6 @@
     "styleImage": "Images/Style/13661_fm.jpg"
   },
   {
-    "styleID": 13680,
-    "brandName": "Authentic Pigment",
-    "styleName": "1915",
-    "title": "Direct-Dyed Twill Visor",
-    "baseCategory": "Headwear",
-    "styleImage": "Images/Style/13680_fm.jpg"
-  },
-  {
     "styleID": 13716,
     "brandName": "Authentic Pigment",
     "styleName": "1917",
@@ -4742,158 +4718,6 @@
     "title": "Pigment-Dyed Booney",
     "baseCategory": "Headwear",
     "styleImage": "Images/Style/13765_fm.jpg"
-  },
-  {
-    "styleID": 10888,
-    "brandName": "AWDis",
-    "styleName": "JHA001",
-    "title": "Unisex College Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/10888_fm.jpg"
-  },
-  {
-    "styleID": 14348,
-    "brandName": "AWDis",
-    "styleName": "JHA003",
-    "title": "Unisex Midweight Varsity Contrast Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14348_fm.jpg"
-  },
-  {
-    "styleID": 14472,
-    "brandName": "AWDis",
-    "styleName": "JHA004",
-    "title": "Unisex Electric Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14472_fm.jpg"
-  },
-  {
-    "styleID": 11067,
-    "brandName": "AWDis",
-    "styleName": "JHA009",
-    "title": "Unisex Baseball Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/11067_fm.jpg"
-  },
-  {
-    "styleID": 11062,
-    "brandName": "AWDis",
-    "styleName": "JHA011",
-    "title": "Unisex Epic Print Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/11062_fm.jpg"
-  },
-  {
-    "styleID": 14474,
-    "brandName": "AWDis",
-    "styleName": "JHA014",
-    "title": "Unisex Camo Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14474_fm.jpg"
-  },
-  {
-    "styleID": 14448,
-    "brandName": "AWDis",
-    "styleName": "JHA016",
-    "title": "Women's Girlie Cropped Hooded Fleece with Pocket",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14448_fm.jpg"
-  },
-  {
-    "styleID": 11063,
-    "brandName": "AWDis",
-    "styleName": "JHA017",
-    "title": "Unisex Surf Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/11063_fm.jpg"
-  },
-  {
-    "styleID": 11024,
-    "brandName": "AWDis",
-    "styleName": "JHA021",
-    "title": "Unisex Cross Neck Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/11024_fm.jpg"
-  },
-  {
-    "styleID": 10900,
-    "brandName": "AWDis",
-    "styleName": "JHA030",
-    "title": "Unisex College Crewneck Sweatshirt",
-    "baseCategory": "Fleece - Premium - Crew",
-    "styleImage": "Images/Style/10900_fm.jpg"
-  },
-  {
-    "styleID": 14452,
-    "brandName": "AWDis",
-    "styleName": "JHA035",
-    "title": "Women's Cropped Crewneck Sweatshirt",
-    "baseCategory": "Fleece - Premium - Crew",
-    "styleImage": "Images/Style/14452_fm.jpg"
-  },
-  {
-    "styleID": 14402,
-    "brandName": "AWDis",
-    "styleName": "JHA050",
-    "title": "Unisex Midweight College Full-Zip Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14402_fm.jpg"
-  },
-  {
-    "styleID": 14466,
-    "brandName": "AWDis",
-    "styleName": "JHA074",
-    "title": "Unisex Tapered Jogger Pants",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/14466_fm.jpg"
-  },
-  {
-    "styleID": 14470,
-    "brandName": "AWDis",
-    "styleName": "JHA080",
-    "title": "Unisex Campus Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/14470_fm.jpg"
-  },
-  {
-    "styleID": 14367,
-    "brandName": "AWDis",
-    "styleName": "JHA101",
-    "title": "Unisex Heavyweight Urban Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14367_fm.jpg"
-  },
-  {
-    "styleID": 10904,
-    "brandName": "AWDis",
-    "styleName": "JHY001",
-    "title": "Youth Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/10904_fm.jpg"
-  },
-  {
-    "styleID": 14477,
-    "brandName": "AWDis",
-    "styleName": "JHY004",
-    "title": "Youth Electric Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/14477_fm.jpg"
-  },
-  {
-    "styleID": 14379,
-    "brandName": "AWDis",
-    "styleName": "JHY030",
-    "title": "Youth Crewneck Sweatshirt",
-    "baseCategory": "Fleece - Premium - Crew",
-    "styleImage": "Images/Style/14379_fm.jpg"
-  },
-  {
-    "styleID": 14313,
-    "brandName": "AWDis",
-    "styleName": "JTA001",
-    "title": "Unisex Cotton T-Shirt",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/14313_fm.jpg"
   },
   {
     "styleID": 4477,
@@ -5824,14 +5648,6 @@
     "styleImage": "Images/Style/3402_fm.jpg"
   },
   {
-    "styleID": 8850,
-    "brandName": "Badger",
-    "styleName": "4203",
-    "title": "Men's Ombre T-Shirt",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/8850_fm.jpg"
-  },
-  {
     "styleID": 10598,
     "brandName": "Badger",
     "styleName": "4212",
@@ -5846,14 +5662,6 @@
     "title": "Unisex Warp T-Shirt",
     "baseCategory": "T-Shirts - Premium",
     "styleImage": "Images/Style/12693_fm.jpg"
-  },
-  {
-    "styleID": 9212,
-    "brandName": "Badger",
-    "styleName": "4220",
-    "title": "Men's Hex 2.0 T-Shirt",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/9212_fm.jpg"
   },
   {
     "styleID": 9666,
@@ -11512,230 +11320,6 @@
     "styleImage": "Images/Style/12398_fm.jpg"
   },
   {
-    "styleID": 10468,
-    "brandName": "Burnside",
-    "styleName": "0101",
-    "title": "Men's Golf Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/10468_fm.jpg"
-  },
-  {
-    "styleID": 9800,
-    "brandName": "Burnside",
-    "styleName": "0800",
-    "title": "Men's Fader Play Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/9800_fm.jpg"
-  },
-  {
-    "styleID": 12531,
-    "brandName": "Burnside",
-    "styleName": "0900",
-    "title": "Men's Dawn to Dusk Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/12531_fm.jpg"
-  },
-  {
-    "styleID": 10471,
-    "brandName": "Burnside",
-    "styleName": "3052",
-    "title": "Men's Polar Fleece Quarter-Zip Pullover",
-    "baseCategory": "Fleece - Premium - Crew",
-    "styleImage": "Images/Style/10471_fm.jpg"
-  },
-  {
-    "styleID": 10498,
-    "brandName": "Burnside",
-    "styleName": "3600",
-    "title": "Men's Polar Fleece Quarter-Zip Hooded Pullover",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/10498_fm.jpg"
-  },
-  {
-    "styleID": 11302,
-    "brandName": "Burnside",
-    "styleName": "4810",
-    "title": "Youth Flannel Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/11302_fm.jpg"
-  },
-  {
-    "styleID": 11180,
-    "brandName": "Burnside",
-    "styleName": "5101",
-    "title": "Women's Burn Golf Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/11180_fm.jpg"
-  },
-  {
-    "styleID": 16317,
-    "brandName": "Burnside",
-    "styleName": "5110",
-    "title": "Women's Dawn to Dusk Scoop Neck",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/16317_fm.jpg"
-  },
-  {
-    "styleID": 10062,
-    "brandName": "Burnside",
-    "styleName": "5605",
-    "title": "Women's Enzyme-Washed French Terry Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/10062_fm.jpg"
-  },
-  {
-    "styleID": 12552,
-    "brandName": "Burnside",
-    "styleName": "5667",
-    "title": "Women's Dawn to Dusk Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/12552_fm.jpg"
-  },
-  {
-    "styleID": 12578,
-    "brandName": "Burnside",
-    "styleName": "5867",
-    "title": "Women's Dawn to Dusk Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/12578_fm.jpg"
-  },
-  {
-    "styleID": 3322,
-    "brandName": "Burnside",
-    "styleName": "8127",
-    "title": "Unisex Yarn-Dyed Hooded Raglan T-Shirt",
-    "baseCategory": "T-Shirts - Long Sleeve",
-    "styleImage": "Images/Style/3322_fm.jpg"
-  },
-  {
-    "styleID": 3323,
-    "brandName": "Burnside",
-    "styleName": "8603",
-    "title": "Men's Printed Stripes Fleece Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/3323_fm.jpg"
-  },
-  {
-    "styleID": 8927,
-    "brandName": "Burnside",
-    "styleName": "8605",
-    "title": "Men's Enzyme-Washed French Terry Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/8927_fm.jpg"
-  },
-  {
-    "styleID": 3320,
-    "brandName": "Burnside",
-    "styleName": "8615",
-    "title": "Men's Camo Full-Zip Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/3320_fm.jpg"
-  },
-  {
-    "styleID": 7553,
-    "brandName": "Burnside",
-    "styleName": "8660",
-    "title": "Men's Performance Raglan Full-Zip Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/7553_fm.jpg"
-  },
-  {
-    "styleID": 8921,
-    "brandName": "Burnside",
-    "styleName": "8670",
-    "title": "Men's Performance Raglan Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/8921_fm.jpg"
-  },
-  {
-    "styleID": 3700,
-    "brandName": "Burnside",
-    "styleName": "8800",
-    "title": "Unisex Fleece Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/3700_fm.jpg"
-  },
-  {
-    "styleID": 7552,
-    "brandName": "Burnside",
-    "styleName": "8801",
-    "title": "Men's Performance Fleece Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/7552_fm.jpg"
-  },
-  {
-    "styleID": 10475,
-    "brandName": "Burnside",
-    "styleName": "8810",
-    "title": "Unisex Flannel Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/10475_fm.jpg"
-  },
-  {
-    "styleID": 12553,
-    "brandName": "Burnside",
-    "styleName": "8857",
-    "title": "Men's Dawn to Dusk Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/12553_fm.jpg"
-  },
-  {
-    "styleID": 11303,
-    "brandName": "Burnside",
-    "styleName": "8888",
-    "title": "Unisex Perfect Joggers",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/11303_fm.jpg"
-  },
-  {
-    "styleID": 2933,
-    "brandName": "Burnside",
-    "styleName": "9301",
-    "title": "Men's Solid Board Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/2933_fm.jpg"
-  },
-  {
-    "styleID": 2935,
-    "brandName": "Burnside",
-    "styleName": "9371",
-    "title": "Men's Diamond Dobby Board Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/2935_fm.jpg"
-  },
-  {
-    "styleID": 2937,
-    "brandName": "Burnside",
-    "styleName": "9803",
-    "title": "Men's Microfiber Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/2937_fm.jpg"
-  },
-  {
-    "styleID": 5624,
-    "brandName": "Burnside",
-    "styleName": "9820",
-    "title": "Men's Hybrid Stretch Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/5624_fm.jpg"
-  },
-  {
-    "styleID": 12554,
-    "brandName": "Burnside",
-    "styleName": "9857",
-    "title": "Men's Dawn to Dusk Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/12554_fm.jpg"
-  },
-  {
-    "styleID": 11917,
-    "brandName": "Burnside",
-    "styleName": "9888",
-    "title": "Unisex Perfect Shorts",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/11917_fm.jpg"
-  },
-  {
     "styleID": 2281,
     "brandName": "C2 Sport",
     "styleName": "5100",
@@ -12080,14 +11664,6 @@
     "styleImage": "Images/Style/10492_fm.jpg"
   },
   {
-    "styleID": 10488,
-    "brandName": "CAP AMERICA",
-    "styleName": "RKL12",
-    "title": "USA-Made Striped Beanie",
-    "baseCategory": "Headwear",
-    "styleImage": "Images/Style/10488_fm.jpg"
-  },
-  {
     "styleID": 9819,
     "brandName": "CAP AMERICA",
     "styleName": "RKP12",
@@ -12118,14 +11694,6 @@
     "title": "USA-Made Variegated Striped Beanie",
     "baseCategory": "Headwear",
     "styleImage": "Images/Style/10496_fm.jpg"
-  },
-  {
-    "styleID": 11373,
-    "brandName": "CAP AMERICA",
-    "styleName": "SKN24",
-    "title": "USA-Made Sustainable Cuffed Beanie",
-    "baseCategory": "Headwear",
-    "styleImage": "Images/Style/11373_fm.jpg"
   },
   {
     "styleID": 11374,
@@ -12190,14 +11758,6 @@
     "title": "Unisex Classic Jersey Dip Dye T-Shirt",
     "baseCategory": "T-Shirts - Premium",
     "styleImage": "Images/Style/15630_fm.jpg"
-  },
-  {
-    "styleID": 8253,
-    "brandName": "Champion",
-    "styleName": "CD400",
-    "title": "Unisex Garment-Dyed Crewneck Sweatshirt",
-    "baseCategory": "Fleece - Premium - Crew",
-    "styleImage": "Images/Style/8253_fm.jpg"
   },
   {
     "styleID": 15640,
@@ -15704,14 +15264,6 @@
     "styleImage": "Images/Style/9179_fm.jpg"
   },
   {
-    "styleID": 9180,
-    "brandName": "DRI DUCK",
-    "styleName": "3467",
-    "title": "Vantage Trucker Cap",
-    "baseCategory": "Headwear",
-    "styleImage": "Images/Style/9180_fm.jpg"
-  },
-  {
     "styleID": 11789,
     "brandName": "DRI DUCK",
     "styleName": "3523",
@@ -17576,14 +17128,6 @@
     "styleImage": "Images/Style/356_fm.jpg"
   },
   {
-    "styleID": 6491,
-    "brandName": "Hanes",
-    "styleName": "MO100",
-    "title": "Men's Modal Triblend T-Shirt",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/6491_fm.jpg"
-  },
-  {
     "styleID": 16218,
     "brandName": "Hanes",
     "styleName": "OG600",
@@ -17686,14 +17230,6 @@
     "title": "Unisex Perfect Sweats Hooded Sweatshirt",
     "baseCategory": "Fleece - Core - Hood",
     "styleImage": "Images/Style/10320_fm.jpg"
-  },
-  {
-    "styleID": 8073,
-    "brandName": "Hanes",
-    "styleName": "S04LS",
-    "title": "Women's Perfect-T Long Sleeve Scoopneck T-Shirt",
-    "baseCategory": "T-Shirts - Long Sleeve",
-    "styleImage": "Images/Style/8073_fm.jpg"
   },
   {
     "styleID": 2857,
@@ -21376,14 +20912,6 @@
     "styleImage": "Images/Style/865_fm.jpg"
   },
   {
-    "styleID": 533,
-    "brandName": "JERZEES",
-    "styleName": "437YR",
-    "title": "SpotShield® Youth 50/50 Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/533_fm.jpg"
-  },
-  {
     "styleID": 6296,
     "brandName": "JERZEES",
     "styleName": "442M",
@@ -21774,14 +21302,6 @@
     "title": "Women's RecycledSoft™ T-Shirt",
     "baseCategory": "T-Shirts - Premium",
     "styleImage": "Images/Style/10544_fm.jpg"
-  },
-  {
-    "styleID": 11930,
-    "brandName": "Kastlfel",
-    "styleName": "4022",
-    "title": "Unisex RecycledSoft™ Hooded Long Sleeve T-Shirt",
-    "baseCategory": "T-Shirts - Long Sleeve",
-    "styleImage": "Images/Style/11930_fm.jpg"
   },
   {
     "styleID": 12501,
@@ -24408,14 +23928,6 @@
     "styleImage": "Images/Style/7807_fm.jpg"
   },
   {
-    "styleID": 10514,
-    "brandName": "MV Sport",
-    "styleName": "W20172",
-    "title": "Women's Jordan Angel Fleece Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/10514_fm.jpg"
-  },
-  {
     "styleID": 7805,
     "brandName": "MV Sport",
     "styleName": "W20173",
@@ -25118,14 +24630,6 @@
     "title": "Men's Triblend Long Sleeve T-Shirt",
     "baseCategory": "T-Shirts - Long Sleeve",
     "styleImage": "Images/Style/4161_fm.jpg"
-  },
-  {
-    "styleID": 4856,
-    "brandName": "Next Level",
-    "styleName": "6072",
-    "title": "Men's Triblend Henley T-Shirt",
-    "baseCategory": "T-Shirts - Long Sleeve",
-    "styleImage": "Images/Style/4856_fm.jpg"
   },
   {
     "styleID": 3226,
@@ -26358,14 +25862,6 @@
     "title": "Women's Saratoga Performance Mini Mesh Polo",
     "baseCategory": "Polos",
     "styleImage": "Images/Style/10540_fm.jpg"
-  },
-  {
-    "styleID": 11328,
-    "brandName": "Paragon",
-    "styleName": "106",
-    "title": "Women's Contrast Insert Mesh Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/11328_fm.jpg"
   },
   {
     "styleID": 10539,
@@ -29248,22 +28744,6 @@
     "styleImage": "Images/Style/7199_fm.jpg"
   },
   {
-    "styleID": 9233,
-    "brandName": "Russell Athletic",
-    "styleName": "600LRUS",
-    "title": "Unisex Combed Ringspun Long Sleeve T-Shirt",
-    "baseCategory": "T-Shirts - Long Sleeve",
-    "styleImage": "Images/Style/9233_fm.jpg"
-  },
-  {
-    "styleID": 9228,
-    "brandName": "Russell Athletic",
-    "styleName": "600MRUS",
-    "title": "Unisex Combed Ringspun T-Shirt",
-    "baseCategory": "T-Shirts - Premium",
-    "styleImage": "Images/Style/9228_fm.jpg"
-  },
-  {
     "styleID": 8890,
     "brandName": "Russell Athletic",
     "styleName": "629X2B",
@@ -29344,14 +28824,6 @@
     "styleImage": "Images/Style/6124_fm.jpg"
   },
   {
-    "styleID": 7206,
-    "brandName": "Russell Athletic",
-    "styleName": "696HBM",
-    "title": "Unisex Dri Power® Closed Bottom Sweatpants",
-    "baseCategory": "Bottoms",
-    "styleImage": "Images/Style/7206_fm.jpg"
-  },
-  {
     "styleID": 6125,
     "brandName": "Russell Athletic",
     "styleName": "697HBM",
@@ -29398,14 +28870,6 @@
     "title": "Unisex Cotton Rich Crewneck Sweatshirt",
     "baseCategory": "Fleece - Premium - Crew",
     "styleImage": "Images/Style/8946_fm.jpg"
-  },
-  {
-    "styleID": 6130,
-    "brandName": "Russell Athletic",
-    "styleName": "995HBB",
-    "title": "Youth Dri Power® Hooded Sweatshirt",
-    "baseCategory": "Fleece - Premium - Hood",
-    "styleImage": "Images/Style/6130_fm.jpg"
   },
   {
     "styleID": 12065,
@@ -30296,102 +29760,6 @@
     "styleImage": "Images/Style/14787_fm.jpg"
   },
   {
-    "styleID": 4341,
-    "brandName": "Sierra Pacific",
-    "styleName": "0100",
-    "title": "Men's Value Polyester Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/4341_fm.jpg"
-  },
-  {
-    "styleID": 12555,
-    "brandName": "Sierra Pacific",
-    "styleName": "0400",
-    "title": "Men's Universal Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/12555_fm.jpg"
-  },
-  {
-    "styleID": 2480,
-    "brandName": "Sierra Pacific",
-    "styleName": "0465",
-    "title": "Men's Colorblocked Moisture Free Mesh Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/2480_fm.jpg"
-  },
-  {
-    "styleID": 1693,
-    "brandName": "Sierra Pacific",
-    "styleName": "0469",
-    "title": "Men's Moisture Free Mesh Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/1693_fm.jpg"
-  },
-  {
-    "styleID": 1695,
-    "brandName": "Sierra Pacific",
-    "styleName": "0500",
-    "title": "Men's Silky Smooth Piqué Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/1695_fm.jpg"
-  },
-  {
-    "styleID": 12560,
-    "brandName": "Sierra Pacific",
-    "styleName": "0740",
-    "title": "Men's Micro Pique Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/12560_fm.jpg"
-  },
-  {
-    "styleID": 1232,
-    "brandName": "Sierra Pacific",
-    "styleName": "3051",
-    "title": "Unisex Fleece Quarter-Zip Pullover",
-    "baseCategory": "Fleece - Premium - Crew",
-    "styleImage": "Images/Style/1232_fm.jpg"
-  },
-  {
-    "styleID": 2147,
-    "brandName": "Sierra Pacific",
-    "styleName": "3351",
-    "title": "Men's Microfleece Quarter-Zip Pullover",
-    "baseCategory": "Fleece - Core - Crew",
-    "styleImage": "Images/Style/2147_fm.jpg"
-  },
-  {
-    "styleID": 5631,
-    "brandName": "Sierra Pacific",
-    "styleName": "5100",
-    "title": "Women's Value Polyester Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/5631_fm.jpg"
-  },
-  {
-    "styleID": 2481,
-    "brandName": "Sierra Pacific",
-    "styleName": "5465",
-    "title": "Women's Colorblocked Moisture Free Mesh Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/2481_fm.jpg"
-  },
-  {
-    "styleID": 1692,
-    "brandName": "Sierra Pacific",
-    "styleName": "5469",
-    "title": "Women's Moisture Free Mesh Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/1692_fm.jpg"
-  },
-  {
-    "styleID": 1694,
-    "brandName": "Sierra Pacific",
-    "styleName": "5500",
-    "title": "Women's Silky Smooth Piqué Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/1694_fm.jpg"
-  },
-  {
     "styleID": 11814,
     "brandName": "SoftShirts",
     "styleName": "200",
@@ -30782,22 +30150,6 @@
     "title": "Infant Polyester Sublimation Bodysuit",
     "baseCategory": "T-Shirts - Premium",
     "styleImage": "Images/Style/2193_fm.jpg"
-  },
-  {
-    "styleID": 16657,
-    "brandName": "Swannies",
-    "styleName": "SW1016",
-    "title": "Men's Archie Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/16657_fm.jpg"
-  },
-  {
-    "styleID": 16661,
-    "brandName": "Swannies",
-    "styleName": "SW1020",
-    "title": "Men's Slomo Polo",
-    "baseCategory": "Polos",
-    "styleImage": "Images/Style/16661_fm.jpg"
   },
   {
     "styleID": 16663,
